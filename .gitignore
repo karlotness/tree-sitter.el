@@ -1,0 +1,8 @@
+# Build outputs
+*.o
+*.so
+*.d
+*.d.*
+
+# Emacs backup files
+*~
