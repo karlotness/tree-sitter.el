@@ -64,7 +64,7 @@ static emacs_value tsel_language_symbol_name(emacs_env *env,
     return tsel_Qnil;
   }
   else if(code < ts_language_symbol_count(lang)) {
-    char *name = ts_language_symbol_name(lang, code);
+    const char *name = ts_language_symbol_name(lang, code);
     return env->make_string(env, name, strlen(name));
   }
   return tsel_Qnil;
