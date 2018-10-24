@@ -16,9 +16,8 @@
 # along with tree-sitter.el. If not, see
 # <https://www.gnu.org/licenses/>.
 CC?=gcc
-LIBS=
-CFLAGS+=-std=c99 -Wall -Wextra -Wpedantic $(shell pkg-config --cflags $(LIBS))
-LDFLAGS += $(shell pkg-config --libs $(LIBS))
+CFLAGS+=-std=c99 -Wall -Wextra -Wpedantic
+LDFLAGS+=-ltreesitter
 
 sources=$(wildcard src/*.c)
 
