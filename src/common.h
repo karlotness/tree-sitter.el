@@ -23,7 +23,7 @@
 #include <emacs-module.h>
 #include <stdbool.h>
 
-bool tsel_init_common(emacs_env *env);
+bool tsel_common_init(emacs_env *env);
 bool tsel_pending_nonlocal_exit(emacs_env *env);
 
 extern emacs_value tsel_Qnil;

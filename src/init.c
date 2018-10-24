@@ -35,7 +35,7 @@ int emacs_module_init(struct emacs_runtime *ert) {
     return 3;
   }
   // Perform initialization
-  if(!tsel_init_common(env)) {
+  if(!tsel_common_init(env)) {
     return 1;
   }
   // Provide the module

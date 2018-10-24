@@ -22,7 +22,7 @@
 emacs_value tsel_Qnil;
 emacs_value tsel_Qt;
 
-bool tsel_init_common(emacs_env *env) {
+bool tsel_common_init(emacs_env *env) {
   tsel_Qt = env->make_global_ref(env, env->intern(env, "t"));
   tsel_Qnil = env->make_global_ref(env, env->intern(env, "nil"));
   if(tsel_pending_nonlocal_exit(env)) {
