@@ -27,4 +27,4 @@ clean:
 	rm -f externals/utf8proc/*.o externals/utf8proc/*.d externals/utf8proc/*.d.*
 	rm -f libtreesitter.so
 
-.PHONY: clean submod
+.PHONY: clean submod install
