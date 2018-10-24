@@ -33,4 +33,7 @@ typedef struct TSElLanguage {
 bool tsel_language_init(emacs_env *env);
 bool tsel_language_p(emacs_env *env, emacs_value obj);
 TSElLanguage *tsel_language_get_ptr(emacs_env *env, emacs_value obj);
+bool tsel_symbol_p(emacs_env *env, emacs_value obj);
+bool tsel_symbol_get_code(emacs_env *env, emacs_value obj, uint16_t *code_out);
+
 #endif //ifndef TSEL_LANGUAGE_H
