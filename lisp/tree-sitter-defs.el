@@ -26,7 +26,9 @@
 ;;; Code:
 (require 'cl-macs)
 
-(cl-defstruct tree-sitter-language ptr)
+(cl-defstruct (tree-sitter-language
+               (:constructor tree-sitter-language--create))
+  ptr)
 (cl-defstruct tree-sitter-parser ptr)
 (cl-defstruct tree-sitter-tree ptr)
 (cl-defstruct tree-sitter-node ptr)
