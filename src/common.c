@@ -34,3 +34,12 @@ bool tsel_common_init(emacs_env *env) {
 bool tsel_pending_nonlocal_exit(emacs_env *env) {
   return env->non_local_exit_check(env) != emacs_funcall_exit_return;
 }
+
+void tsel_signal_wrong_type(emacs_env *env, char *type_pred_name, emacs_value val_provided) {
+  emacs_value Qlist = env->intern(env, "list");
+  emacs_value Qwrong_type_arg = env->intern(env, "wrong-type-argument");
+  emacs_value Qtype_pred = env->intern(env, type_pred_name);
+  emacs_value args[2] = { Qtype_pred, val_provided};
+  emacs_value err_info = env->funcall(env, Qlist, 2, args);
+  env->non_local_exit_signal(env, Qwrong_type_arg, err_info);
+}

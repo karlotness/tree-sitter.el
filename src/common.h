@@ -25,6 +25,7 @@
 
 bool tsel_common_init(emacs_env *env);
 bool tsel_pending_nonlocal_exit(emacs_env *env);
+void tsel_signal_wrong_type(emacs_env *env, char *type_pred_name, emacs_value val_provided);
 
 extern emacs_value tsel_Qnil;
 extern emacs_value tsel_Qt;
