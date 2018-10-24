@@ -25,6 +25,14 @@ int plugin_is_GPL_compatible;
 // Bind to Emacs
 int emacs_module_init(struct emacs_runtime *ert) {
   emacs_env *env = ert->get_environment(ert);
+  // Require the definitions
+  emacs_value require_feature = env->intern(env, "tree-sitter-defs");
+  emacs_value Qrequire = env->intern(env, "require");
+  emacs_value args[1] = { require_feature };
+  env->funcall(env, Qrequire, 1, args);
+  if(tsel_pending_nonlocal_exit(env)) {
+    return 3;
+  }
   // Provide the module
   emacs_value feature_name = env->intern(env, "tree-sitter-module");
   emacs_value provide_symbol = env->intern(env, "provide");
