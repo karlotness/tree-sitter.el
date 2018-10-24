@@ -41,7 +41,10 @@ int emacs_module_init(struct emacs_runtime *ert) {
   // Provide the module
   emacs_value feature_name = env->intern(env, "tree-sitter-module");
   emacs_value provide_symbol = env->intern(env, "provide");
-  emacs_value args[1] = { feature_name };
+  args[0] = feature_name;
   env->funcall(env, provide_symbol, 1, args);
+  if(tsel_pending_nonlocal_exit(env)) {
+    return 4;
+  }
   return 0;
 }
