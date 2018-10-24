@@ -22,11 +22,11 @@ LDFLAGS += $(shell pkg-config --libs $(LIBS))
 
 sources=$(wildcard src/*.c)
 
-all: tree-sitter-c.so
+all: tree-sitter-module.so
 
 include $(sources:.c=.d)
 
-tree-sitter-c.so: $(sources:.c=.o)
+tree-sitter-module.so: $(sources:.c=.o)
 	$(CC) -shared $(LDFLAGS) -o $@ $^
 
 %.o: %.c
@@ -41,6 +41,6 @@ tree-sitter-c.so: $(sources:.c=.o)
 
 clean:
 	rm -f src/*.o src/*.d src/*.d.*
-	rm -f tree-sitter-c.so
+	rm -f tree-sitter-module.so
 
 .PHONY: clean
