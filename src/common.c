@@ -43,3 +43,23 @@ void tsel_signal_wrong_type(emacs_env *env, char *type_pred_name, emacs_value va
   emacs_value err_info = env->funcall(env, Qlist, 2, args);
   env->non_local_exit_signal(env, Qwrong_type_arg, err_info);
 }
+
+bool tsel_define_function(emacs_env *env, char *function_name, emacs_function *func,
+                          ptrdiff_t min_arg_count, ptrdiff_t max_arg_count, const char *doc,
+                          void *data) {
+  emacs_value efunc = env->make_function(env, min_arg_count, max_arg_count, func, doc, data);
+  if(tsel_pending_nonlocal_exit(env)) {
+    return false;
+  }
+  emacs_value f_name = env->intern(env, function_name);
+  emacs_value Qdefalias = env->intern(env, "defalias");
+  emacs_value args[2] = { f_name, efunc };
+  if(tsel_pending_nonlocal_exit(env)) {
+    return false;
+  }
+  env->funcall(env, Qdefalias, 2, args);
+  if(tsel_pending_nonlocal_exit(env)) {
+    return false;
+  }
+  return true;
+}

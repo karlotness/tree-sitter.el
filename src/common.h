@@ -23,9 +23,16 @@
 #include <emacs-module.h>
 #include <stdbool.h>
 
+typedef emacs_value (emacs_function) (emacs_env *env,
+                                      ptrdiff_t nargs, emacs_value *args,
+                                      void *data);
+
 bool tsel_common_init(emacs_env *env);
 bool tsel_pending_nonlocal_exit(emacs_env *env);
 void tsel_signal_wrong_type(emacs_env *env, char *type_pred_name, emacs_value val_provided);
+bool tsel_define_function(emacs_env *env, char *function_name, emacs_function *func,
+                          ptrdiff_t min_arg_count, ptrdiff_t max_arg_count, const char *doc,
+                          void *data);
 
 extern emacs_value tsel_Qnil;
 extern emacs_value tsel_Qt;
