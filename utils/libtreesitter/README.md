@@ -5,11 +5,13 @@ tree-sitter node-gyp build process, but modified to produce a
 relocatable shared object rather than a statically linked library.
 
 To build tree-sitter using the makefile, first clone the tree-sitter
-[repository][1]. Next, the tree-sitter runtime requires the
-`externals/utf8proc` submodule. Unless you have particular
-requirements for how these modules should be fetched (for example, if
-you are packaging the runtime) you can run `make submod` to clone this
-submodule.
+[repository][1] and place the `GNUmakefile` into the `tree-sitter`
+root directory.
+
+Next, the tree-sitter runtime requires the `externals/utf8proc`
+submodule. Unless you have particular requirements for how these
+modules should be fetched (for example, if you are packaging the
+runtime) you can run `make submod` to clone this submodule.
 
 Next, build `libtreesitter.so` by running `make`. Finally, you can
 install the runtime shared object and headers with `make install`. If
