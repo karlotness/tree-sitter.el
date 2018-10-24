@@ -23,7 +23,7 @@
 int plugin_is_GPL_compatible;
 
 // Bind to Emacs
-int emacs_module_init (struct emacs_runtime *ert) {
+int emacs_module_init(struct emacs_runtime *ert) {
   emacs_env *env = ert->get_environment(ert);
   // Provide the module
   emacs_value feature_name = env->intern(env, "tree-sitter-module");
