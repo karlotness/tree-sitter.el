@@ -29,6 +29,10 @@
 (cl-defstruct (tree-sitter-language
                (:constructor tree-sitter-language--create))
   ptr)
+(cl-defstruct (tree-sitter-symbol
+               (:constructor tree-sitter-symbol--create))
+  code)
+
 (cl-defstruct tree-sitter-parser ptr)
 (cl-defstruct tree-sitter-tree ptr)
 (cl-defstruct tree-sitter-node ptr)
