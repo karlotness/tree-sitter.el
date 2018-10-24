@@ -18,6 +18,7 @@
  * <https://www.gnu.org/licenses/>.
  */
 #include <emacs-module.h>
+#include "common.h"
 
 // Required symbol for Emacs loading
 int plugin_is_GPL_compatible;
@@ -32,6 +33,10 @@ int emacs_module_init(struct emacs_runtime *ert) {
   env->funcall(env, Qrequire, 1, args);
   if(tsel_pending_nonlocal_exit(env)) {
     return 3;
+  }
+  // Perform initialization
+  if(!tsel_init_common(env)) {
+    return 1;
   }
   // Provide the module
   emacs_value feature_name = env->intern(env, "tree-sitter-module");
