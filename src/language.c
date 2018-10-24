@@ -21,6 +21,10 @@
 #include "language.h"
 #include "common.h"
 
+bool tsel_language_init(emacs_env *env) {
+  return true;
+}
+
 bool tsel_language_p(emacs_env *env, emacs_value obj) {
   // Ensure the pointer is wrapped in the proper Emacs structure type
   emacs_value Qts_lang_p = env->intern(env, "tree-sitter-language-p");
