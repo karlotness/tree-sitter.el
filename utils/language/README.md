@@ -6,7 +6,7 @@ quickly from one of the language grammars distributed by the
 should produce a module which can be loaded and used with
 `tree-sitter.el`.
 
-# Setup
+## Setup
 The main tasks you will need to perform are:
 1. Clone a language repository (such as [python][2])
 2. Copy the files from this directory into the root of the language
