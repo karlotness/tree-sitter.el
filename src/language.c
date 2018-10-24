@@ -41,10 +41,42 @@ static emacs_value tsel_language_symbol_count(emacs_env *env,
   return env->make_integer(env, s_count);
 }
 
+char *tsel_language_symbol_name_doc = "Retrieve the name of SYMBOL under LANG.\n"
+  "LANG is a tree-sitter-language and SYMBOL is a tree-sitter-symbol.\n"
+  "Returns the symbol name as a string or nil, if it is not defined.\n"
+  "\n"
+  "(fn LANG SYMBOL)";
+static emacs_value tsel_language_symbol_name(emacs_env *env,
+                                             __attribute__((unused)) ptrdiff_t nargs,
+                                             emacs_value *args,
+                                             __attribute__((unused)) void *data) {
+  if(!tsel_language_p(env, args[0])) {
+    tsel_signal_wrong_type(env, "tree-sitter-language-p", args[0]);
+    return tsel_Qnil;
+  }
+  else if(!tsel_symbol_p(env, args[1])) {
+    tsel_signal_wrong_type(env, "tree-sitter-symbol-p", args[0]);
+    return tsel_Qnil;
+  }
+  TSLanguage *lang = tsel_language_get_ptr(env, args[0])->ptr;
+  uint16_t code = 0;
+  if(!tsel_symbol_get_code(env, args[1], &code) || tsel_pending_nonlocal_exit(env)) {
+    return tsel_Qnil;
+  }
+  else if(code < ts_language_symbol_count(lang)) {
+    char *name = ts_language_symbol_name(lang, code);
+    return env->make_string(env, name, strlen(name));
+  }
+  return tsel_Qnil;
+}
+
 bool tsel_language_init(emacs_env *env) {
   bool function_result = tsel_define_function(env, "tree-sitter-language-symbol-count",
                                               &tsel_language_symbol_count, 1, 1,
                                               tsel_language_symbol_count_doc, NULL);
+  function_result = tsel_define_function(env, "tree-sitter-language-symbol-name",
+                                         &tsel_language_symbol_name, 2, 2,
+                                         tsel_language_symbol_name_doc, NULL);
   if(!function_result) {
     return false;
   }
