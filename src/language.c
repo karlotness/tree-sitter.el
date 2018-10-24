@@ -21,7 +21,33 @@
 #include "language.h"
 #include "common.h"
 
+char *tsel_language_symbol_count_doc = "Count the number of symbols in LANG.\n"
+  "LANG is a `tree-sitter-language-p' object.\n"
+  "\n"
+  "(fn LANG)";
+static emacs_value tsel_language_symbol_count(emacs_env *env,
+                                              __attribute__((unused)) ptrdiff_t nargs,
+                                              emacs_value *args,
+                                              __attribute__((unused)) void *data) {
+  if(!tsel_language_p(env, args[0])) {
+    tsel_signal_wrong_type(env, "tree-sitter-language-p", args[0]);
+    return tsel_Qnil;
+  }
+  TSElLanguage *ptr = tsel_language_get_ptr(env, args[0]);
+  if(tsel_pending_nonlocal_exit(env)) {
+    return tsel_Qnil;
+  }
+  uint32_t s_count = ts_language_symbol_count(ptr->ptr);
+  return env->make_integer(env, s_count);
+}
+
 bool tsel_language_init(emacs_env *env) {
+  bool function_result = tsel_define_function(env, "tree-sitter-language-symbol-count",
+                                              &tsel_language_symbol_count, 1, 1,
+                                              tsel_language_symbol_count_doc, NULL);
+  if(!function_result) {
+    return false;
+  }
   return true;
 }
 
