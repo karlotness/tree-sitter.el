@@ -35,6 +35,8 @@ bool tsel_define_function(emacs_env *env, char *function_name, emacs_function *f
                           void *data);
 bool tsel_record_get_field(emacs_env *env, emacs_value obj, uint8_t field, emacs_value *out);
 bool tsel_check_record_type(emacs_env *env, char *record_type, emacs_value obj);
+bool tsel_string_p(emacs_env *env, emacs_value obj);
+char *tsel_extract_string(emacs_env *env, emacs_value obj);
 
 extern emacs_value tsel_Qnil;
 extern emacs_value tsel_Qt;

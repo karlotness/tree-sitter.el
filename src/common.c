@@ -17,6 +17,7 @@
  * along with tree-sitter.el. If not, see
  * <https://www.gnu.org/licenses/>.
  */
+#include <stdlib.h>
 #include "common.h"
 
 emacs_value tsel_Qnil;
@@ -95,4 +96,33 @@ bool tsel_check_record_type(emacs_env *env, char *record_type, emacs_value obj) 
     return false;
   }
   return true;
+}
+
+bool tsel_string_p(emacs_env *env, emacs_value obj) {
+  emacs_value Qstringp = env->intern(env, "stringp");
+  emacs_value args[1] = { obj };
+  if(!env->eq(env, env->funcall(env, Qstringp, 1, args), tsel_Qt) ||
+     tsel_pending_nonlocal_exit(env)) {
+    return false;
+  }
+  return true;
+}
+
+char *tsel_extract_string(emacs_env *env, emacs_value obj) {
+  if(!tsel_string_p(env, obj)) {
+    return NULL;
+  }
+  ptrdiff_t size = 0;
+  if(!env->copy_string_contents(env, obj, NULL, &size)) {
+    return NULL;
+  }
+  char *buf = malloc(sizeof(char) * size);
+  if(!buf) {
+    return NULL;
+  }
+  if(!env->copy_string_contents(env, obj, buf, &size)) {
+    free(buf);
+    return NULL;
+  }
+  return buf;
 }
