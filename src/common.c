@@ -18,6 +18,7 @@
  * <https://www.gnu.org/licenses/>.
  */
 #include <stdlib.h>
+#include <string.h>
 #include "common.h"
 
 emacs_value tsel_Qnil;
@@ -122,4 +123,13 @@ char *tsel_extract_string(emacs_env *env, emacs_value obj) {
     return NULL;
   }
   return buf;
+}
+
+void tsel_signal_error(emacs_env *env, char *message) {
+  emacs_value str = env->make_string(env, message, strlen(message));
+  emacs_value Qlist = env->intern(env, "list");
+  emacs_value Qerror = env->intern(env, "error");
+  emacs_value args[1] = { str };
+  emacs_value payload = env->funcall(env, Qlist, 1, args);
+  env->non_local_exit_signal(env, Qerror, payload);
 }
