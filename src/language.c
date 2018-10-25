@@ -18,6 +18,7 @@
  * <https://www.gnu.org/licenses/>.
  */
 #include <string.h>
+#include <stdlib.h>
 #include "language.h"
 #include "symbol.h"
 #include "common.h"
@@ -71,6 +72,41 @@ static emacs_value tsel_language_symbol_name(emacs_env *env,
   return tsel_Qnil;
 }
 
+char *tsel_language_symbol_for_name_doc = "Retrieve a symbol from LANG by its NAME.\n"
+  "LANG is a tree-sitter-language and NAME is a string naming a symbol.\n"
+  "Returns the symbol or nil if it was not found.\n"
+  "\n"
+  "(fn LANG NAME)";
+static emacs_value tsel_language_symbol_for_name(emacs_env *env,
+                                                 __attribute__((unused)) ptrdiff_t nargs,
+                                                 emacs_value *args,
+                                                 __attribute__((unused)) void *data) {
+  if(!tsel_language_p(env, args[0])) {
+    tsel_signal_wrong_type(env, "tree-sitter-language-p", args[0]);
+    return tsel_Qnil;
+  }
+  else if(!tsel_string_p(env, args[1])) {
+    tsel_signal_wrong_type(env, "stringp", args[1]);
+    return tsel_Qnil;
+  }
+  TSLanguage *lang = tsel_language_get_ptr(env, args[0])->ptr;
+  if(tsel_pending_nonlocal_exit(env)) {
+    return tsel_Qnil;
+  }
+  char *str = tsel_extract_string(env, args[1]);
+  if(!str) {
+    return tsel_Qnil;
+  }
+  TSSymbol symbol = ts_language_symbol_for_name(lang, str);
+  emacs_value res;
+  free(str);
+  str = NULL;
+  if(symbol == 0 || !tsel_symbol_create(env, symbol, &res)) {
+    return tsel_Qnil;
+  }
+  return res;
+}
+
 char *tsel_language_p_wrapped_doc = "Return t if OBJECT is a tree-sitter-language.\n"
   "\n"
   "(fn OBJECT)";
@@ -91,6 +127,9 @@ bool tsel_language_init(emacs_env *env) {
   function_result &= tsel_define_function(env, "tree-sitter-language-symbol-name",
                                           &tsel_language_symbol_name, 2, 2,
                                           tsel_language_symbol_name_doc, NULL);
+  function_result &= tsel_define_function(env, "tree-sitter-language-symbol-for-name",
+                                          &tsel_language_symbol_for_name, 2, 2,
+                                          tsel_language_symbol_for_name_doc, NULL);
   function_result &= tsel_define_function(env, "tree-sitter-language-p",
                                           &tsel_language_p_wrapped, 1, 1,
                                           tsel_language_p_wrapped_doc, NULL);
