@@ -26,6 +26,7 @@
 typedef emacs_value (emacs_function) (emacs_env *env,
                                       ptrdiff_t nargs, emacs_value *args,
                                       void *data);
+typedef void (emacs_finalizer) (void *obj);
 
 bool tsel_common_init(emacs_env *env);
 bool tsel_pending_nonlocal_exit(emacs_env *env);
