@@ -56,7 +56,7 @@ static emacs_value tsel_language_symbol_name(emacs_env *env,
     return tsel_Qnil;
   }
   else if(!tsel_symbol_p(env, args[1])) {
-    tsel_signal_wrong_type(env, "tree-sitter-symbol-p", args[0]);
+    tsel_signal_wrong_type(env, "tree-sitter-symbol-p", args[1]);
     return tsel_Qnil;
   }
   TSLanguage *lang = tsel_language_get_ptr(env, args[0])->ptr;
