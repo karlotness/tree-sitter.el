@@ -25,9 +25,13 @@
 ;;; Code:
 
 (defun tree-sitter-language--create (ptr)
+  "Create a new tree-sitter-language record.
+Users should not call this function."
   (record 'tree-sitter-language ptr))
 
 (defun tree-sitter-symbol--create (code)
+  "Create a new tree-sitter-symbol record.
+Users should not call this function."
   (record 'tree-sitter-symbol code))
 
 (provide 'tree-sitter-defs)
