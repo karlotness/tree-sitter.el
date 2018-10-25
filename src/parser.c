@@ -29,9 +29,9 @@ static void tsel_parser_fin(void *ptr) {
 
 char *tsel_parser_new_doc = "Create a new tree-sitter parser.\n";
 static emacs_value tsel_parser_new(emacs_env *env,
-                                           __attribute__((unused)) ptrdiff_t nargs,
-                                           __attribute__((unused)) emacs_value *args,
-                                           __attribute__((unused)) void *data) {
+                                   __attribute__((unused)) ptrdiff_t nargs,
+                                   __attribute__((unused)) emacs_value *args,
+                                   __attribute__((unused)) void *data) {
   TSElParser *wrapper = malloc(sizeof(TSElParser));
   TSParser *parser = ts_parser_new();
   if(!wrapper || !parser) {
