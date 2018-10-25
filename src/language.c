@@ -71,6 +71,19 @@ static emacs_value tsel_language_symbol_name(emacs_env *env,
   return tsel_Qnil;
 }
 
+char *tsel_language_p_wrapped_doc = "Return t if OBJECT is a tree-sitter-language.\n"
+  "\n"
+  "(fn OBJECT)";
+static emacs_value tsel_language_p_wrapped(emacs_env *env,
+                                           __attribute__((unused)) ptrdiff_t nargs,
+                                           emacs_value *args,
+                                           __attribute__((unused)) void *data) {
+  if(tsel_language_p(env, args[0])) {
+    return tsel_Qt;
+  }
+  return tsel_Qnil;
+}
+
 bool tsel_language_init(emacs_env *env) {
   bool function_result = tsel_define_function(env, "tree-sitter-language-symbol-count",
                                               &tsel_language_symbol_count, 1, 1,
@@ -78,6 +91,9 @@ bool tsel_language_init(emacs_env *env) {
   function_result &= tsel_define_function(env, "tree-sitter-language-symbol-name",
                                           &tsel_language_symbol_name, 2, 2,
                                           tsel_language_symbol_name_doc, NULL);
+  function_result &= tsel_define_function(env, "tree-sitter-language-p",
+                                          &tsel_language_p_wrapped, 1, 1,
+                                          tsel_language_p_wrapped_doc, NULL);
   if(!function_result) {
     return false;
   }
@@ -85,18 +101,17 @@ bool tsel_language_init(emacs_env *env) {
 }
 
 bool tsel_language_p(emacs_env *env, emacs_value obj) {
-  // Ensure the pointer is wrapped in the proper Emacs structure type
-  emacs_value Qts_lang_p = env->intern(env, "tree-sitter-language-p");
-  emacs_value args[1] = { obj };
-  if(!env->eq(env, env->funcall(env, Qts_lang_p, 1, args), tsel_Qt) ||
-     tsel_pending_nonlocal_exit(env)) {
+  if(!tsel_check_record_type(env, "tree-sitter-language", obj)) {
     return false;
   }
-  // Extract the "ptr" field and make sure it's a user pointer
-  emacs_value Qts_lang_ptr = env->intern(env, "tree-sitter-language-ptr");
-  emacs_value user_ptr = env->funcall(env, Qts_lang_ptr, 1, args);
+  // Get the ptr field
+  emacs_value user_ptr;
+  if(!tsel_record_get_field(env, obj, 1, &user_ptr)) {
+    return false;
+  }
+  // Make sure it's a user pointer
   emacs_value Quser_ptrp = env->intern(env, "user-ptrp");
-  args[0] = user_ptr;
+  emacs_value args[1] = { user_ptr };
   if(!env->eq(env, env->funcall(env, Quser_ptrp, 1, args), tsel_Qt) ||
      tsel_pending_nonlocal_exit(env)) {
     return false;
@@ -114,9 +129,12 @@ TSElLanguage *tsel_language_get_ptr(emacs_env *env, emacs_value obj) {
   if(!tsel_language_p(env, obj)) {
     return NULL;
   }
-  emacs_value Qts_lang_ptr = env->intern(env, "tree-sitter-language-ptr");
-  emacs_value args[1] = { obj };
-  emacs_value user_ptr = env->funcall(env, Qts_lang_ptr, 1, args);
+    // Get the ptr field
+  emacs_value user_ptr;
+  if(!tsel_record_get_field(env, obj, 1, &user_ptr)) {
+    return false;
+  }
+  // Get the raw pointer
   TSElLanguage *ptr = env->get_user_ptr(env, user_ptr);
   if(tsel_pending_nonlocal_exit(env)) {
     return NULL;

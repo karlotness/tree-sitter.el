@@ -63,3 +63,36 @@ bool tsel_define_function(emacs_env *env, char *function_name, emacs_function *f
   }
   return true;
 }
+
+bool tsel_record_get_field(emacs_env *env, emacs_value obj, uint8_t field, emacs_value *out) {
+  emacs_value Qaref = env->intern(env, "aref");
+  emacs_value num = env->make_integer(env, field);
+  emacs_value args[2] = { obj, num };
+  emacs_value value = env->funcall(env, Qaref, 2, args);
+  if(tsel_pending_nonlocal_exit(env)) {
+    return false;
+  }
+  *out = value;
+  return true;
+}
+
+bool tsel_check_record_type(emacs_env *env, char *record_type, emacs_value obj) {
+  // Ensure the pointer is wrapped in the proper Emacs record type
+  emacs_value Qrecordp = env->intern(env, "recordp");
+  emacs_value args[2] = { obj, NULL};
+  if(!env->eq(env, env->funcall(env, Qrecordp, 1, args), tsel_Qt) ||
+     tsel_pending_nonlocal_exit(env)) {
+    return false;
+  }
+  // Check the record type tag
+  emacs_value Qaref = env->intern(env, "aref");
+  emacs_value zero = env->make_integer(env, 0);
+  emacs_value type_symbol = env->intern(env, record_type);
+  args[0] = obj;
+  args[1] = zero;
+  if(!env->eq(env, env->funcall(env, Qaref, 2, args), type_symbol) ||
+     tsel_pending_nonlocal_exit(env)) {
+    return false;
+  }
+  return true;
+}

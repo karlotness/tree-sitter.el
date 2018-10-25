@@ -24,10 +24,9 @@ static emacs_value tree_sitter_get_lang(emacs_env *env,
                                         __attribute__((unused)) emacs_value *args,
                                         __attribute__((unused)) void *data) {
   emacs_value Qts_language_create = env->intern(env, "tree-sitter-language--create");
-  emacs_value Qts_ptr_key = env->intern(env, ":ptr");
   emacs_value user_ptr = env->make_user_ptr(env, NULL, &lang);
-  emacs_value func_args[2] = { Qts_ptr_key, user_ptr };
-  return env->funcall(env, Qts_language_create, 2, func_args);
+  emacs_value func_args[1] = { user_ptr };
+  return env->funcall(env, Qts_language_create, 1, func_args);
 }
 
 TSLanguage *tree_sitter_LANG_NAME();

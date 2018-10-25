@@ -33,6 +33,8 @@ void tsel_signal_wrong_type(emacs_env *env, char *type_pred_name, emacs_value va
 bool tsel_define_function(emacs_env *env, char *function_name, emacs_function *func,
                           ptrdiff_t min_arg_count, ptrdiff_t max_arg_count, const char *doc,
                           void *data);
+bool tsel_record_get_field(emacs_env *env, emacs_value obj, uint8_t field, emacs_value *out);
+bool tsel_check_record_type(emacs_env *env, char *record_type, emacs_value obj);
 
 extern emacs_value tsel_Qnil;
 extern emacs_value tsel_Qt;
