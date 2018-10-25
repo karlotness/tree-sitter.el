@@ -18,8 +18,12 @@
  * <https://www.gnu.org/licenses/>.
  */
 #include <stdlib.h>
+#include <string.h>
 #include "parser.h"
 #include "common.h"
+
+#define TSEL_PARSE_CHAR_BUFFER_SIZE 500
+static char tsel_parser_char_buffer[TSEL_PARSE_CHAR_BUFFER_SIZE + 1];
 
 static void tsel_parser_fin(void *ptr) {
   TSElParser *parser = ptr;
@@ -90,6 +94,67 @@ static emacs_value tsel_parser_language(emacs_env *env,
   return tsel_language_wrap(env, lang);
 }
 
+struct tsel_parser_buffer_payload {
+  emacs_env *env;
+  emacs_value buffer;
+};
+
+static const char *tsel_parser_read_buffer_function(void *payload, uint32_t byte_index,
+                                                    __attribute__((unused)) TSPoint position,
+                                                    uint32_t *bytes_read) {
+  // Extract the payload
+  struct tsel_parser_buffer_payload *buf_payload = payload;
+  emacs_env *env = buf_payload->env;
+  emacs_value buffer = buf_payload->buffer;
+  // Call our buffer function to get a string
+  emacs_value Qts_buffer_substring = env->intern(env, "tree-sitter--buffer-substring");
+  emacs_value byte_pos = env->make_integer(env, byte_index);
+  // Leave one char left over so Emacs doesn't complain about the buffer size
+  emacs_value read_length = env->make_integer(env, TSEL_PARSE_CHAR_BUFFER_SIZE - 1);
+  emacs_value args[3] = { buffer, byte_pos, read_length };
+  emacs_value str = env->funcall(env, Qts_buffer_substring, 3, args);
+  ptrdiff_t size = TSEL_PARSE_CHAR_BUFFER_SIZE;
+  if(!env->copy_string_contents(env, str, (char*) &tsel_parser_char_buffer, &size)) {
+    *bytes_read = 0;
+    return NULL;
+  }
+  // Add our own null character, just to be sure
+  tsel_parser_char_buffer[TSEL_PARSE_CHAR_BUFFER_SIZE] = '\0';
+  *bytes_read = size;
+  return (char*) &tsel_parser_char_buffer;
+}
+
+char *tsel_parser_parse_buffer_doc = "Use parser PARSE on buffer BUF.\n"
+  "Returns the resulting parse tree.\n"
+  "\n"
+  "(fn PARSE BUF &optional TREE)";
+static emacs_value tsel_parser_parse_buffer(emacs_env *env,
+                                            __attribute__((unused)) ptrdiff_t nargs,
+                                            emacs_value *args,
+                                            __attribute__((unused)) void *data) {
+  if(!tsel_parser_p(env, args[0])) {
+    tsel_signal_wrong_type(env, "tree-sitter-parser-p", args[0]);
+    return tsel_Qnil;
+  }
+  // Check that second arg is a buffer
+  emacs_value Qbufferp = env->intern(env, "bufferp");
+  if(!env->eq(env, tsel_Qt, env->funcall(env, Qbufferp, 1, &args[1])) ||
+     tsel_pending_nonlocal_exit(env)) {
+    tsel_signal_wrong_type(env, "bufferp", args[1]);
+    return tsel_Qnil;
+  }
+  // TODO: handle tree case
+  struct tsel_parser_buffer_payload payload = {.env = env,
+                                               .buffer = args[1]};
+  TSInput input_def = {.payload = &payload,
+                       .encoding = TSInputEncodingUTF8,
+                       .read = &tsel_parser_read_buffer_function};
+  TSParser *parse = tsel_parser_get_ptr(env, args[0])->parser;
+  ts_parser_parse(parse, NULL, input_def);
+  return tsel_Qt;
+}
+
+
 char *tsel_parser_set_language_doc = "Set the language of parser PARSE to LANG.\n"
   "\n"
   "(fn PARSE LANG)";
@@ -157,6 +222,9 @@ bool tsel_parser_init(emacs_env *env) {
   function_result &= tsel_define_function(env, "tree-sitter-parser-set-language",
                                           &tsel_parser_set_language, 2, 2,
                                           tsel_parser_set_language_doc, NULL);
+  function_result &= tsel_define_function(env, "tree-sitter-parser-parse-buffer",
+                                          &tsel_parser_parse_buffer, 2, 3,
+                                          tsel_parser_parse_buffer_doc, NULL);
   return function_result;
 }
 
