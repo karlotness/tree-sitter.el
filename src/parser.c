@@ -58,9 +58,46 @@ static emacs_value tsel_parser_new(emacs_env *env,
   return res;
 }
 
+char *tsel_parser_p_wrapped_doc = "Return t if OBJECT is a tree-sitter-parser.\n"
+  "\n"
+  "(fn OBJECT)";
+static emacs_value tsel_parser_p_wrapped(emacs_env *env,
+                                         __attribute__((unused)) ptrdiff_t nargs,
+                                         emacs_value *args,
+                                         __attribute__((unused)) void *data) {
+  if(tsel_parser_p(env, args[0])) {
+    return tsel_Qt;
+  }
+  return tsel_Qnil;
+}
+
+bool tsel_parser_p(emacs_env *env, emacs_value obj) {
+  if(!tsel_check_record_type(env, "tree-sitter-parser", obj)) {
+    return false;
+  }
+  // Get the ptr field
+  emacs_value user_ptr;
+  if(!tsel_record_get_field(env, obj, 1, &user_ptr)) {
+    return false;
+  }
+  // Make sure it's a user pointer
+  emacs_value Quser_ptrp = env->intern(env, "user-ptrp");
+  emacs_value args[1] = { user_ptr };
+  if(!env->eq(env, env->funcall(env, Quser_ptrp, 1, args), tsel_Qt) ||
+     tsel_pending_nonlocal_exit(env)) {
+    return false;
+  }
+  // Check the finalizer
+  emacs_finalizer *fin = env->get_user_finalizer(env, user_ptr);
+  return !tsel_pending_nonlocal_exit(env) && fin == &tsel_parser_fin;
+}
+
 bool tsel_parser_init(emacs_env *env) {
   bool function_result = tsel_define_function(env, "tree-sitter-parser-new",
                                               &tsel_parser_new, 0, 0,
                                               tsel_parser_new_doc, NULL);
+  function_result &= tsel_define_function(env, "tree-sitter-parser-p",
+                                          &tsel_parser_p_wrapped, 1, 1,
+                                          tsel_parser_p_wrapped_doc, NULL);
   return function_result;
 }
