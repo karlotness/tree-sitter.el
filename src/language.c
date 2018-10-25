@@ -230,7 +230,7 @@ TSElLanguage *tsel_language_get_ptr(emacs_env *env, emacs_value obj) {
     // Get the ptr field
   emacs_value user_ptr;
   if(!tsel_record_get_field(env, obj, 1, &user_ptr)) {
-    return false;
+    return NULL;
   }
   // Get the raw pointer
   TSElLanguage *ptr = env->get_user_ptr(env, user_ptr);
