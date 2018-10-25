@@ -61,7 +61,7 @@ bool tsel_symbol_p(emacs_env *env, emacs_value obj) {
   return true;
 }
 
-bool tsel_symbol_get_code(emacs_env *env, emacs_value obj, uint16_t *code_out) {
+bool tsel_symbol_get_code(emacs_env *env, emacs_value obj, TSSymbol *code_out) {
   if(!tsel_symbol_p(env, obj)) {
     return false;
   }

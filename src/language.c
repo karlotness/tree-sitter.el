@@ -60,7 +60,7 @@ static emacs_value tsel_language_symbol_name(emacs_env *env,
     return tsel_Qnil;
   }
   TSLanguage *lang = tsel_language_get_ptr(env, args[0])->ptr;
-  uint16_t code = 0;
+  TSSymbol code = 0;
   if(!tsel_symbol_get_code(env, args[1], &code) || tsel_pending_nonlocal_exit(env)) {
     return tsel_Qnil;
   }

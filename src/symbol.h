@@ -25,6 +25,6 @@
 
 bool tsel_symbol_init(emacs_env *env);
 bool tsel_symbol_p(emacs_env *env, emacs_value obj);
-bool tsel_symbol_get_code(emacs_env *env, emacs_value obj, uint16_t *code_out);
+bool tsel_symbol_get_code(emacs_env *env, emacs_value obj, TSSymbol *code_out);
 
 #endif //ifndef TSEL_SYMBOL_H
