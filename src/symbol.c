@@ -78,3 +78,15 @@ bool tsel_symbol_get_code(emacs_env *env, emacs_value obj, TSSymbol *code_out) {
   *code_out = raw_code;
   return true;
 }
+
+bool tsel_symbol_create(emacs_env *env, TSSymbol code, emacs_value *obj_out) {
+  emacs_value ecode = env->make_integer(env, code);
+  emacs_value Qts_symb_create = env->intern(env, "tree-sitter-symbol--create");
+  emacs_value args[1] = { ecode };
+  emacs_value res = env->funcall(env, Qts_symb_create, 1, args);
+  if(tsel_pending_nonlocal_exit(env)) {
+    return false;
+  }
+  *obj_out = res;
+  return true;
+}
