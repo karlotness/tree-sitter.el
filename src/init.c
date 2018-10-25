@@ -20,6 +20,7 @@
 #include <emacs-module.h>
 #include "common.h"
 #include "language.h"
+#include "symbol.h"
 
 // Required symbol for Emacs loading
 int plugin_is_GPL_compatible;
@@ -36,7 +37,8 @@ int emacs_module_init(struct emacs_runtime *ert) {
     return 3;
   }
   // Perform initialization
-  if(!tsel_common_init(env) || !tsel_language_init(env)) {
+  if(!tsel_common_init(env) || !tsel_language_init(env) ||
+     !tsel_symbol_init(env)) {
     return 1;
   }
   // Provide the module
