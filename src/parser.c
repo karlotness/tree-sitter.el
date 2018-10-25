@@ -90,6 +90,39 @@ static emacs_value tsel_parser_language(emacs_env *env,
   return tsel_language_wrap(env, lang);
 }
 
+char *tsel_parser_set_language_doc = "Set the language of parser PARSE to LANG.\n"
+  "\n"
+  "(fn PARSE LANG)";
+static emacs_value tsel_parser_set_language(emacs_env *env,
+                                            __attribute__((unused)) ptrdiff_t nargs,
+                                            emacs_value *args,
+                                            __attribute__((unused)) void *data) {
+  if(!tsel_parser_p(env, args[0])) {
+    tsel_signal_wrong_type(env, "tree-sitter-parser-p", args[0]);
+    return tsel_Qnil;
+  }
+  bool lang_is_nil = env->eq(env, args[1], tsel_Qnil);
+  if((!tsel_language_p(env, args[1]) && !lang_is_nil) ||
+     tsel_pending_nonlocal_exit(env)) {
+    tsel_signal_wrong_type(env, "tree-sitter-language-p", args[1]);
+    return tsel_Qnil;
+  }
+  TSElParser *parse = tsel_parser_get_ptr(env, args[0]);
+  TSElLanguage *lang = NULL;
+  TSLanguage *raw_lang = NULL;
+  if(!lang_is_nil) {
+    lang = tsel_language_get_ptr(env, args[1]);
+    raw_lang = lang->ptr;
+  }
+  if(tsel_pending_nonlocal_exit(env) ||
+     !ts_parser_set_language(parse->parser, raw_lang)) {
+    tsel_signal_error(env, "Failed to set language");
+    return tsel_Qnil;
+  }
+  parse->lang = lang;
+  return tsel_Qnil;
+}
+
 bool tsel_parser_p(emacs_env *env, emacs_value obj) {
   if(!tsel_check_record_type(env, "tree-sitter-parser", obj)) {
     return false;
@@ -121,6 +154,9 @@ bool tsel_parser_init(emacs_env *env) {
   function_result &= tsel_define_function(env, "tree-sitter-parser-language",
                                           &tsel_parser_language, 1, 1,
                                           tsel_parser_language_doc, NULL);
+  function_result &= tsel_define_function(env, "tree-sitter-parser-set-language",
+                                          &tsel_parser_set_language, 2, 2,
+                                          tsel_parser_set_language_doc, NULL);
   return function_result;
 }
 

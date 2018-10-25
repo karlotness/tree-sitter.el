@@ -2,11 +2,11 @@
 #+OPTIONS: ^:nil
 
 ** API Categories
-*** Parser [17%]
+*** Parser [23%]
 - [X] ts_parser_new
 - [X] ts_parser_delete
 - [X] ts_parser_language
-- [ ] ts_parser_set_language
+- [X] ts_parser_set_language
 - [ ] ts_parser_logger
 - [ ] ts_parser_set_logger
 - [ ] ts_parser_print_dot_graphs
