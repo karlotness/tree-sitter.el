@@ -195,10 +195,7 @@ bool tsel_language_init(emacs_env *env) {
   function_result &= tsel_define_function(env, "tree-sitter-language-p",
                                           &tsel_language_p_wrapped, 1, 1,
                                           tsel_language_p_wrapped_doc, NULL);
-  if(!function_result) {
-    return false;
-  }
-  return true;
+  return function_result;
 }
 
 bool tsel_language_p(emacs_env *env, emacs_value obj) {

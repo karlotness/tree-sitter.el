@@ -37,10 +37,7 @@ bool tsel_symbol_init(__attribute__((unused)) emacs_env *env) {
   bool function_result = tsel_define_function(env, "tree-sitter-symbol-p",
                                               &tsel_symbol_p_wrapped, 1, 1,
                                               tsel_symbol_p_wrapped_doc, NULL);
-  if(!function_result) {
-    return false;
-  }
-  return true;
+  return function_result;
 }
 
 bool tsel_symbol_p(emacs_env *env, emacs_value obj) {
