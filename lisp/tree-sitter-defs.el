@@ -24,17 +24,11 @@
 ;; definitions and the like.
 
 ;;; Code:
-(require 'cl-macs)
-
 (defun tree-sitter-language--create (ptr)
   (record 'tree-sitter-language ptr))
 
 (defun tree-sitter-symbol--create (code)
   (record 'tree-sitter-symbol code))
-
-(cl-defstruct tree-sitter-parser ptr)
-(cl-defstruct tree-sitter-tree ptr)
-(cl-defstruct tree-sitter-node ptr)
 
 (provide 'tree-sitter-defs)
 ;;; tree-sitter-defs.el ends here
