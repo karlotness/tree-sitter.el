@@ -20,10 +20,10 @@
 
 ;;; Commentary:
 
-;; Common definitions used in tree-sitter.el. These are `cl-defstruct'
-;; definitions and the like.
+;; Common definitions used in tree-sitter.el.
 
 ;;; Code:
+
 (defun tree-sitter-language--create (ptr)
   (record 'tree-sitter-language ptr))
 
