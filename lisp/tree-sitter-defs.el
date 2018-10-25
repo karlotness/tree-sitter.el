@@ -39,5 +39,26 @@ Users should not call this function."
 Users should not call this function."
   (record 'tree-sitter-parser ptr))
 
+(defun tree-sitter--coerce-byte (buf byte-pos)
+  "Coerce a byte BYTE-POS into a valid buffer location within BUF.
+Users should not call this function."
+  (with-current-buffer buf
+    (cond ((< byte-pos 0) (point-min))
+          ((byte-to-position (1+ byte-pos)) (byte-to-position (1+ byte-pos)))
+          (t (save-restriction
+               (widen)
+               (point-max))))))
+
+(defun tree-sitter--buffer-substring (buf byte-pos read-len)
+  "Return a substring from buffer BUF starting a BYTE-POS for length READ-LEN.
+Users should not call this function."
+  (with-current-buffer buf
+    (save-restriction
+      (widen)
+      (let* ((disable-point-adjustment t)
+             (start (tree-sitter--coerce-byte buf byte-pos))
+             (end (tree-sitter--coerce-byte buf (+ byte-pos read-len))))
+        (buffer-substring start end)))))
+
 (provide 'tree-sitter-defs)
 ;;; tree-sitter-defs.el ends here
