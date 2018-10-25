@@ -145,6 +145,24 @@ static emacs_value tsel_language_symbol_type(emacs_env *env,
   return tsel_Qnil;
 }
 
+char *tsel_language_version_doc = "Return the version of language LANG.\n"
+  "\n"
+  "(fn LANG)";
+static emacs_value tsel_language_version(emacs_env *env,
+                                             __attribute__((unused)) ptrdiff_t nargs,
+                                             emacs_value *args,
+                                             __attribute__((unused)) void *data) {
+  if(!tsel_language_p(env, args[0])) {
+    tsel_signal_wrong_type(env, "tree-sitter-language-p", args[0]);
+    return tsel_Qnil;
+  }
+  TSLanguage *lang = tsel_language_get_ptr(env, args[0])->ptr;
+  if(!lang) {
+    return tsel_Qnil;
+  }
+  return env->make_integer(env, ts_language_version(lang));
+}
+
 char *tsel_language_p_wrapped_doc = "Return t if OBJECT is a tree-sitter-language.\n"
   "\n"
   "(fn OBJECT)";
@@ -171,6 +189,9 @@ bool tsel_language_init(emacs_env *env) {
   function_result &= tsel_define_function(env, "tree-sitter-language-symbol-type",
                                           &tsel_language_symbol_type, 2, 2,
                                           tsel_language_symbol_type_doc, NULL);
+  function_result &= tsel_define_function(env, "tree-sitter-language-version",
+                                          &tsel_language_version, 1, 1,
+                                          tsel_language_version_doc, NULL);
   function_result &= tsel_define_function(env, "tree-sitter-language-p",
                                           &tsel_language_p_wrapped, 1, 1,
                                           tsel_language_p_wrapped_doc, NULL);
