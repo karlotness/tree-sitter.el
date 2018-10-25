@@ -22,6 +22,7 @@
 #define TSEL_PARSER_H
 #include <stdbool.h>
 #include <emacs-module.h>
+#include <tree_sitter/runtime.h>
 
 bool tsel_parser_init(emacs_env *env);
 
