@@ -24,6 +24,8 @@
 
 #define TSEL_PARSE_CHAR_BUFFER_SIZE 500
 static char tsel_parser_char_buffer[TSEL_PARSE_CHAR_BUFFER_SIZE + 1];
+static emacs_value Qts_buffer_substring;
+static emacs_value emacs_buffer_read_length;
 
 static void tsel_parser_fin(void *ptr) {
   TSElParser *parser = ptr;
@@ -107,11 +109,9 @@ static const char *tsel_parser_read_buffer_function(void *payload, uint32_t byte
   emacs_env *env = buf_payload->env;
   emacs_value buffer = buf_payload->buffer;
   // Call our buffer function to get a string
-  emacs_value Qts_buffer_substring = env->intern(env, "tree-sitter--buffer-substring");
   emacs_value byte_pos = env->make_integer(env, byte_index);
   // Leave one char left over so Emacs doesn't complain about the buffer size
-  emacs_value read_length = env->make_integer(env, TSEL_PARSE_CHAR_BUFFER_SIZE - 1);
-  emacs_value args[3] = { buffer, byte_pos, read_length };
+  emacs_value args[3] = { buffer, byte_pos, emacs_buffer_read_length };
   emacs_value str = env->funcall(env, Qts_buffer_substring, 3, args);
   ptrdiff_t size = TSEL_PARSE_CHAR_BUFFER_SIZE;
   if(!env->copy_string_contents(env, str, (char*) &tsel_parser_char_buffer, &size)) {
@@ -210,6 +210,11 @@ bool tsel_parser_p(emacs_env *env, emacs_value obj) {
 }
 
 bool tsel_parser_init(emacs_env *env) {
+  Qts_buffer_substring = env->make_global_ref(env, env->intern(env, "tree-sitter--buffer-substring"));
+  emacs_buffer_read_length = env->make_global_ref(env, env->make_integer(env, TSEL_PARSE_CHAR_BUFFER_SIZE - 1));
+  if(tsel_pending_nonlocal_exit(env)) {
+    return false;
+  }
   bool function_result = tsel_define_function(env, "tree-sitter-parser-new",
                                               &tsel_parser_new, 0, 0,
                                               tsel_parser_new_doc, NULL);
