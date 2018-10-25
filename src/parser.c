@@ -17,11 +17,14 @@
  * along with tree-sitter.el. If not, see
  * <https://www.gnu.org/licenses/>.
  */
+#include <stdlib.h>
 #include "parser.h"
 #include "common.h"
 
 static void tsel_parser_fin(void *ptr) {
-  ts_parser_delete(ptr);
+  TSElParser *parser = ptr;
+  ts_parser_delete(parser->parser);
+  free(parser);
 }
 
 char *tsel_parser_new_doc = "Create a new tree-sitter parser.\n";
@@ -29,13 +32,27 @@ static emacs_value tsel_parser_new(emacs_env *env,
                                            __attribute__((unused)) ptrdiff_t nargs,
                                            __attribute__((unused)) emacs_value *args,
                                            __attribute__((unused)) void *data) {
+  TSElParser *wrapper = malloc(sizeof(TSElParser));
   TSParser *parser = ts_parser_new();
-  emacs_value new_parser = env->make_user_ptr(env, &tsel_parser_fin, parser);
+  if(!wrapper || !parser) {
+    if(wrapper) {
+      free(wrapper);
+    }
+    if(parser) {
+      ts_parser_delete(parser);
+    }
+    tsel_signal_error(env, "Initialization failed");
+    return tsel_Qnil;
+  }
+  wrapper->parser = parser;
+  wrapper->lang = NULL;
+  emacs_value new_parser = env->make_user_ptr(env, &tsel_parser_fin, wrapper);
   emacs_value Qts_parser_create = env->intern(env, "tree-sitter-parser--create");
   emacs_value funargs[1] = { new_parser };
   emacs_value res = env->funcall(env, Qts_parser_create, 1, funargs);
   if(tsel_pending_nonlocal_exit(env)) {
-    ts_parser_delete(parser);
+    tsel_parser_fin(wrapper);
+    tsel_signal_error(env, "Initialization failed");
     return tsel_Qnil;
   }
   return res;

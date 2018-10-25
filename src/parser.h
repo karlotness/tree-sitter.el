@@ -23,6 +23,12 @@
 #include <stdbool.h>
 #include <emacs-module.h>
 #include <tree_sitter/runtime.h>
+#include "language.h"
+
+typedef struct TSElParser {
+  TSParser *parser;
+  TSElLanguage *lang;
+} TSElParser;
 
 bool tsel_parser_init(emacs_env *env);
 
