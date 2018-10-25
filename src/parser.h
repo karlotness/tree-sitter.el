@@ -32,5 +32,6 @@ typedef struct TSElParser {
 
 bool tsel_parser_init(emacs_env *env);
 bool tsel_parser_p(emacs_env *env, emacs_value obj);
+TSElParser *tsel_parser_get_ptr(emacs_env *env, emacs_value obj);
 
 #endif //ifndef TSEL_PARSER_H
