@@ -71,6 +71,25 @@ static emacs_value tsel_parser_p_wrapped(emacs_env *env,
   return tsel_Qnil;
 }
 
+char *tsel_parser_language_doc = "Return the language of parser PARSE.\n"
+  "\n"
+  "(fn PARSE)";
+static emacs_value tsel_parser_language(emacs_env *env,
+                                                __attribute__((unused)) ptrdiff_t nargs,
+                                                emacs_value *args,
+                                                __attribute__((unused)) void *data) {
+  if(!tsel_parser_p(env, args[0])) {
+    tsel_signal_wrong_type(env, "tree-sitter-parser-p", args[0]);
+    return tsel_Qnil;
+  }
+  TSElParser *parse = tsel_parser_get_ptr(env, args[0]);
+  TSElLanguage *lang = parse->lang;
+  if(!lang) {
+    return tsel_Qnil;
+  }
+  return tsel_language_wrap(env, lang);
+}
+
 bool tsel_parser_p(emacs_env *env, emacs_value obj) {
   if(!tsel_check_record_type(env, "tree-sitter-parser", obj)) {
     return false;
@@ -99,6 +118,9 @@ bool tsel_parser_init(emacs_env *env) {
   function_result &= tsel_define_function(env, "tree-sitter-parser-p",
                                           &tsel_parser_p_wrapped, 1, 1,
                                           tsel_parser_p_wrapped_doc, NULL);
+  function_result &= tsel_define_function(env, "tree-sitter-parser-language",
+                                          &tsel_parser_language, 1, 1,
+                                          tsel_parser_language_doc, NULL);
   return function_result;
 }
 
