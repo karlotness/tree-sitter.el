@@ -29,9 +29,8 @@
 (defun tree-sitter-language--create (ptr)
   (record 'tree-sitter-language ptr))
 
-(cl-defstruct (tree-sitter-symbol
-               (:constructor tree-sitter-symbol--create))
-  code)
+(defun tree-sitter-symbol--create (code)
+  (record 'tree-sitter-symbol code))
 
 (cl-defstruct tree-sitter-parser ptr)
 (cl-defstruct tree-sitter-tree ptr)
