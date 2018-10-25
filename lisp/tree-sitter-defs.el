@@ -34,5 +34,10 @@ Users should not call this function."
 Users should not call this function."
   (record 'tree-sitter-symbol code))
 
+(defun tree-sitter-parser--create (ptr)
+  "Create a new tree-sitter-parser record.
+Users should not call this function."
+  (record 'tree-sitter-parser ptr))
+
 (provide 'tree-sitter-defs)
 ;;; tree-sitter-defs.el ends here
