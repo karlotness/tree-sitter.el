@@ -10,7 +10,7 @@ The main steps:
 2. Place the `GNUmakefile` from this directory into the `tree-sitter`
    root directory
 3. Initialize the `externals/utf8proc` submodule
-   - One approach, run: `make submod` which will do this step
+   - One approach: run `make submod` which will do this step
 4. Build `libtreesitter.so` by running `make`
 5. Install the shared object and headers
    - `make install` will do this for you
