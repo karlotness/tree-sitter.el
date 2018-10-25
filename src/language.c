@@ -75,9 +75,9 @@ bool tsel_language_init(emacs_env *env) {
   bool function_result = tsel_define_function(env, "tree-sitter-language-symbol-count",
                                               &tsel_language_symbol_count, 1, 1,
                                               tsel_language_symbol_count_doc, NULL);
-  function_result = tsel_define_function(env, "tree-sitter-language-symbol-name",
-                                         &tsel_language_symbol_name, 2, 2,
-                                         tsel_language_symbol_name_doc, NULL);
+  function_result &= tsel_define_function(env, "tree-sitter-language-symbol-name",
+                                          &tsel_language_symbol_name, 2, 2,
+                                          tsel_language_symbol_name_doc, NULL);
   if(!function_result) {
     return false;
   }
