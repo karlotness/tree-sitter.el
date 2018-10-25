@@ -239,3 +239,10 @@ TSElLanguage *tsel_language_get_ptr(emacs_env *env, emacs_value obj) {
   }
   return ptr;
 }
+
+emacs_value tsel_language_wrap(emacs_env *env, TSElLanguage *lang) {
+  emacs_value Qts_language_create = env->intern(env, "tree-sitter-language--create");
+  emacs_value user_ptr = env->make_user_ptr(env, NULL, lang);
+  emacs_value func_args[1] = { user_ptr };
+  return env->funcall(env, Qts_language_create, 1, func_args);
+}
