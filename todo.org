@@ -67,9 +67,9 @@
 - [ ] ts_tree_cursor_goto_next_sibling
 - [ ] ts_tree_cursor_goto_first_child
 - [ ] ts_tree_cursor_goto_first_child_for_byte
-*** Language [60%]
+*** Language [80%]
 - [X] ts_language_symbol_count
 - [X] ts_language_symbol_name
 - [X] ts_language_symbol_for_name
-- [ ] ts_language_symbol_type
+- [X] ts_language_symbol_type
 - [ ] ts_language_version

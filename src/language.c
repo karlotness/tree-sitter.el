@@ -107,6 +107,44 @@ static emacs_value tsel_language_symbol_for_name(emacs_env *env,
   return res;
 }
 
+char *tsel_language_symbol_type_doc = "Return the type of SYMBOL.\n"
+  "Type type of SYMBOL is determined under the tree-sitter-language LANG.\n"
+  "This will be one of 'regular, 'anonymous, or 'auxiliary. The value nil may\n"
+  "be returned for unknown types, but this should occur only under a version mismatch\n"
+  "with the underlying tree-sitter library.\n"
+  "\n"
+  "(fn LANG SYMBOL)";
+static emacs_value tsel_language_symbol_type(emacs_env *env,
+                                             __attribute__((unused)) ptrdiff_t nargs,
+                                             emacs_value *args,
+                                             __attribute__((unused)) void *data) {
+  if(!tsel_language_p(env, args[0])) {
+    tsel_signal_wrong_type(env, "tree-sitter-language-p", args[0]);
+    return tsel_Qnil;
+  }
+  else if(!tsel_symbol_p(env, args[1])) {
+    tsel_signal_wrong_type(env, "tree-sitter-symbol-p", args[1]);
+    return tsel_Qnil;
+  }
+  TSLanguage *lang = tsel_language_get_ptr(env, args[0])->ptr;
+  TSSymbol symbol;
+  if(!lang || !tsel_symbol_get_code(env, args[1], &symbol) ||
+     tsel_pending_nonlocal_exit(env)) {
+    return tsel_Qnil;
+  }
+  TSSymbolType type = ts_language_symbol_type(lang, symbol);
+  if(type == TSSymbolTypeRegular) {
+    return env->intern(env, "regular");
+  }
+  else if(type == TSSymbolTypeAnonymous) {
+    return env->intern(env, "anonymous");
+  }
+  else if(type == TSSymbolTypeAuxiliary) {
+    return env->intern(env, "auxiliary");
+  }
+  return tsel_Qnil;
+}
+
 char *tsel_language_p_wrapped_doc = "Return t if OBJECT is a tree-sitter-language.\n"
   "\n"
   "(fn OBJECT)";
@@ -130,6 +168,9 @@ bool tsel_language_init(emacs_env *env) {
   function_result &= tsel_define_function(env, "tree-sitter-language-symbol-for-name",
                                           &tsel_language_symbol_for_name, 2, 2,
                                           tsel_language_symbol_for_name_doc, NULL);
+  function_result &= tsel_define_function(env, "tree-sitter-language-symbol-type",
+                                          &tsel_language_symbol_type, 2, 2,
+                                          tsel_language_symbol_type_doc, NULL);
   function_result &= tsel_define_function(env, "tree-sitter-language-p",
                                           &tsel_language_p_wrapped, 1, 1,
                                           tsel_language_p_wrapped_doc, NULL);
