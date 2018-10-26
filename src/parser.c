@@ -121,7 +121,7 @@ static const char *tsel_parser_read_buffer_function(void *payload, uint32_t byte
   }
   // Add our own null character, just to be sure
   tsel_parser_char_buffer[TSEL_PARSE_CHAR_BUFFER_SIZE] = '\0';
-  *bytes_read = size;
+  *bytes_read = size - 1;
   return (char*) &tsel_parser_char_buffer;
 }
 
