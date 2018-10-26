@@ -11,8 +11,7 @@ The main tasks you will need to perform are:
 1. Clone a language repository (such as [python][2])
 2. Copy the files from this directory into the root of the language
    grammar
-3. Replace all instances of `LANGUAGE_NAME` with the name of your
-   binding
+3. Replace all instances of `LANG_NAME` with the name of your binding
    - Some will use underscores and some dashes
    - Also make this replacement in the file names
    - For example for Python you would end up with the file
