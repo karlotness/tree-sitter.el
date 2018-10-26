@@ -29,8 +29,9 @@ it can be dynamically linked. See the "libtreesitter"
 the tree-sitter runtime shared object.
 
 Once you have built the shared object place it somewhere it can be
-dynamically linked on your system (like under `/usr/lib` or similar).
-You may want to package this file to do this.
+dynamically linked on your system (such as `/usr/lib/` or similar).
+You may want to package the shared object file and install it with
+your package manager.
 
 ### Language grammar
 To make any real use of the module you will also need a language
