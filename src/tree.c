@@ -26,7 +26,7 @@ static void tsel_tree_fin(void *ptr) {
   tsel_tree_release(tree);
 }
 
-char *tsel_tree_p_wrapped_doc = "Return t if OBJECT is a tree-sitter-tree.\n"
+static char *tsel_tree_p_wrapped_doc = "Return t if OBJECT is a tree-sitter-tree.\n"
   "\n"
   "(fn OBJECT)";
 static emacs_value tsel_tree_p_wrapped(emacs_env *env,
@@ -39,7 +39,7 @@ static emacs_value tsel_tree_p_wrapped(emacs_env *env,
   return tsel_Qnil;
 }
 
-char *tsel_tree_root_node_doc = "Return the root node of TREE.\n"
+static char *tsel_tree_root_node_doc = "Return the root node of TREE.\n"
   "\n"
   "(fn TREE)";
 static emacs_value tsel_tree_root_node(emacs_env *env,

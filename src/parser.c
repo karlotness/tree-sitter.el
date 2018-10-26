@@ -34,7 +34,7 @@ static void tsel_parser_fin(void *ptr) {
   free(parser);
 }
 
-char *tsel_parser_new_doc = "Create a new tree-sitter parser.\n";
+static char *tsel_parser_new_doc = "Create a new tree-sitter parser.\n";
 static emacs_value tsel_parser_new(emacs_env *env,
                                    __attribute__((unused)) ptrdiff_t nargs,
                                    __attribute__((unused)) emacs_value *args,
@@ -65,7 +65,7 @@ static emacs_value tsel_parser_new(emacs_env *env,
   return res;
 }
 
-char *tsel_parser_p_wrapped_doc = "Return t if OBJECT is a tree-sitter-parser.\n"
+static char *tsel_parser_p_wrapped_doc = "Return t if OBJECT is a tree-sitter-parser.\n"
   "\n"
   "(fn OBJECT)";
 static emacs_value tsel_parser_p_wrapped(emacs_env *env,
@@ -78,7 +78,7 @@ static emacs_value tsel_parser_p_wrapped(emacs_env *env,
   return tsel_Qnil;
 }
 
-char *tsel_parser_language_doc = "Return the language of parser PARSE.\n"
+static char *tsel_parser_language_doc = "Return the language of parser PARSE.\n"
   "\n"
   "(fn PARSE)";
 static emacs_value tsel_parser_language(emacs_env *env,
@@ -125,7 +125,7 @@ static const char *tsel_parser_read_buffer_function(void *payload, uint32_t byte
   return (char*) &tsel_parser_char_buffer;
 }
 
-char *tsel_parser_parse_buffer_doc = "Use parser PARSE on buffer BUF.\n"
+static char *tsel_parser_parse_buffer_doc = "Use parser PARSE on buffer BUF.\n"
   "Returns the resulting parse tree.\n"
   "\n"
   "(fn PARSE BUF &optional TREE)";
@@ -180,7 +180,7 @@ static emacs_value tsel_parser_parse_buffer(emacs_env *env,
 }
 
 
-char *tsel_parser_set_language_doc = "Set the language of parser PARSE to LANG.\n"
+static char *tsel_parser_set_language_doc = "Set the language of parser PARSE to LANG.\n"
   "\n"
   "(fn PARSE LANG)";
 static emacs_value tsel_parser_set_language(emacs_env *env,

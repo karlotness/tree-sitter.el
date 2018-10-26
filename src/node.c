@@ -26,7 +26,7 @@ static void tsel_node_fin(void *ptr) {
   tsel_node_free(node);
 }
 
-char *tsel_node_p_wrapped_doc = "Return t if OBJECT is a tree-sitter-node.\n"
+static char *tsel_node_p_wrapped_doc = "Return t if OBJECT is a tree-sitter-node.\n"
   "\n"
   "(fn OBJECT)";
 static emacs_value tsel_node_p_wrapped(emacs_env *env,

@@ -23,7 +23,7 @@
 #include "symbol.h"
 #include "common.h"
 
-char *tsel_language_symbol_count_doc = "Count the number of symbols in LANG.\n"
+static char *tsel_language_symbol_count_doc = "Count the number of symbols in LANG.\n"
   "LANG is a `tree-sitter-language-p' object.\n"
   "\n"
   "(fn LANG)";
@@ -43,7 +43,7 @@ static emacs_value tsel_language_symbol_count(emacs_env *env,
   return env->make_integer(env, s_count);
 }
 
-char *tsel_language_symbol_name_doc = "Retrieve the name of SYMBOL under LANG.\n"
+static char *tsel_language_symbol_name_doc = "Retrieve the name of SYMBOL under LANG.\n"
   "LANG is a tree-sitter-language and SYMBOL is a tree-sitter-symbol.\n"
   "Returns the symbol name as a string or nil, if it is not defined.\n"
   "\n"
@@ -72,7 +72,7 @@ static emacs_value tsel_language_symbol_name(emacs_env *env,
   return tsel_Qnil;
 }
 
-char *tsel_language_symbol_for_name_doc = "Retrieve a symbol from LANG by its NAME.\n"
+static char *tsel_language_symbol_for_name_doc = "Retrieve a symbol from LANG by its NAME.\n"
   "LANG is a tree-sitter-language and NAME is a string naming a symbol.\n"
   "Returns the symbol or nil if it was not found.\n"
   "\n"
@@ -107,7 +107,7 @@ static emacs_value tsel_language_symbol_for_name(emacs_env *env,
   return res;
 }
 
-char *tsel_language_symbol_type_doc = "Return the type of SYMBOL.\n"
+static char *tsel_language_symbol_type_doc = "Return the type of SYMBOL.\n"
   "Type type of SYMBOL is determined under the tree-sitter-language LANG.\n"
   "This will be one of 'regular, 'anonymous, or 'auxiliary. The value nil may\n"
   "be returned for unknown types, but this should occur only under a version mismatch\n"
@@ -145,7 +145,7 @@ static emacs_value tsel_language_symbol_type(emacs_env *env,
   return tsel_Qnil;
 }
 
-char *tsel_language_version_doc = "Return the version of language LANG.\n"
+static char *tsel_language_version_doc = "Return the version of language LANG.\n"
   "\n"
   "(fn LANG)";
 static emacs_value tsel_language_version(emacs_env *env,
@@ -163,7 +163,7 @@ static emacs_value tsel_language_version(emacs_env *env,
   return env->make_integer(env, ts_language_version(lang));
 }
 
-char *tsel_language_p_wrapped_doc = "Return t if OBJECT is a tree-sitter-language.\n"
+static char *tsel_language_p_wrapped_doc = "Return t if OBJECT is a tree-sitter-language.\n"
   "\n"
   "(fn OBJECT)";
 static emacs_value tsel_language_p_wrapped(emacs_env *env,
