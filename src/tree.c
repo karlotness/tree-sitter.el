@@ -19,6 +19,7 @@
  */
 #include "tree.h"
 #include "common.h"
+#include "node.h"
 
 static void tsel_tree_fin(void *ptr) {
   TSElTree *tree = ptr;
@@ -38,10 +39,43 @@ static emacs_value tsel_tree_p_wrapped(emacs_env *env,
   return tsel_Qnil;
 }
 
+char *tsel_tree_root_node_doc = "Return the root node of TREE.\n"
+  "\n"
+  "(fn TREE)";
+static emacs_value tsel_tree_root_node(emacs_env *env,
+                                       __attribute__((unused)) ptrdiff_t nargs,
+                                       emacs_value *args,
+                                       __attribute__((unused)) void *data) {
+  if(!tsel_tree_p(env, args[0])) {
+    tsel_signal_wrong_type(env, "tree-sitter-tree-p", args[0]);
+    return tsel_Qnil;
+  }
+  TSElTree *tree = tsel_tree_get_ptr(env, args[0]);
+  if(!tree) {
+    tsel_signal_error(env, "Failed to get tree.");
+    return tsel_Qnil;
+  }
+  TSNode root = ts_tree_root_node(tree->tree);
+  TSElNode *wrapped = tsel_node_wrap(root, tree);
+  if(!wrapped) {
+    tsel_signal_error(env, "Allocation failed.");
+    return tsel_Qnil;
+  }
+  emacs_value res = tsel_node_emacs_move(env, wrapped);
+  if(tsel_pending_nonlocal_exit(env)) {
+    tsel_signal_error(env, "Allocation failed.");
+    return tsel_Qnil;
+  }
+  return res;
+}
+
 bool tsel_tree_init(emacs_env *env) {
   bool function_result = tsel_define_function(env, "tree-sitter-tree-p",
                                               &tsel_tree_p_wrapped, 1, 1,
                                               tsel_tree_p_wrapped_doc, NULL);
+  function_result &= tsel_define_function(env, "tree-sitter-tree-root-node",
+                                          &tsel_tree_root_node, 1, 1,
+                                          tsel_tree_root_node_doc, NULL);
   return function_result;
 }
 
