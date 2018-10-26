@@ -28,12 +28,12 @@
 - [ ] ts_tree_get_changed_ranges
 - [ ] ts_tree_print_dot_graph
 - [ ] ts_tree_language
-*** Node [0%]
+*** Node [3%]
 - [ ] ts_node_start_byte
 - [ ] ts_node_start_point
 - [ ] ts_node_end_byte
 - [ ] ts_node_end_point
-- [ ] ts_node_symbol
+- [X] ts_node_symbol
 - [ ] ts_node_type
 - [ ] ts_node_string
 - [ ] ts_node_eq

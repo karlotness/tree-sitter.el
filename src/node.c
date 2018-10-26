@@ -20,6 +20,7 @@
 #include <stdlib.h>
 #include "node.h"
 #include "common.h"
+#include "symbol.h"
 
 static void tsel_node_fin(void *ptr) {
   TSElNode *node = ptr;
@@ -39,10 +40,38 @@ static emacs_value tsel_node_p_wrapped(emacs_env *env,
   return tsel_Qnil;
 }
 
+static char *tsel_node_symbol_doc = "Return the symbol of node NODE\n"
+  "\n"
+  "(fn NODE)";
+static emacs_value tsel_node_symbol(emacs_env *env,
+                                    __attribute__((unused)) ptrdiff_t nargs,
+                                    emacs_value *args,
+                                    __attribute__((unused)) void *data) {
+  if(!tsel_node_p(env, args[0])) {
+    tsel_signal_wrong_type(env, "tree-sitter-node-p", args[0]);
+    return tsel_Qnil;
+  }
+  TSElNode *node = tsel_node_get_ptr(env, args[0]);
+  if(!node || tsel_pending_nonlocal_exit(env)) {
+    tsel_signal_error(env, "Failed to retrieve node.");
+    return tsel_Qnil;
+  }
+  TSSymbol symb = ts_node_symbol(node->node);
+  emacs_value obj;
+  if(!tsel_symbol_create(env, symb, &obj)) {
+    tsel_signal_error(env, "Allocation failed.");
+    return tsel_Qnil;
+  }
+  return obj;
+}
+
 bool tsel_node_init(emacs_env *env) {
   bool function_result = tsel_define_function(env, "tree-sitter-node-p",
                                               &tsel_node_p_wrapped, 1, 1,
                                               tsel_node_p_wrapped_doc, NULL);
+  function_result &= tsel_define_function(env, "tree-sitter-node-symbol",
+                                          &tsel_node_symbol, 1, 1,
+                                          tsel_node_symbol_doc, NULL);
   return function_result;
 }
 
