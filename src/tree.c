@@ -51,6 +51,9 @@ void tsel_tree_retain(TSElTree *tree) {
 }
 
 void tsel_tree_release(TSElTree *tree) {
+  if(!tree) {
+    return;
+  }
   if(tree->refcount > 0) {
     tree->refcount--;
   }
