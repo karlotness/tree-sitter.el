@@ -82,9 +82,9 @@ char *tsel_parser_language_doc = "Return the language of parser PARSE.\n"
   "\n"
   "(fn PARSE)";
 static emacs_value tsel_parser_language(emacs_env *env,
-                                                __attribute__((unused)) ptrdiff_t nargs,
-                                                emacs_value *args,
-                                                __attribute__((unused)) void *data) {
+                                        __attribute__((unused)) ptrdiff_t nargs,
+                                        emacs_value *args,
+                                        __attribute__((unused)) void *data) {
   if(!tsel_parser_p(env, args[0])) {
     tsel_signal_wrong_type(env, "tree-sitter-parser-p", args[0]);
     return tsel_Qnil;
