@@ -63,6 +63,9 @@ emacs_value tsel_tree_emacs_move(emacs_env *env, TSElTree *tree) {
 }
 
 void tsel_tree_retain(TSElTree *tree) {
+  if(!tree) {
+    return;
+  }
   tree->refcount++;
 }
 
