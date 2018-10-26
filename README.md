@@ -5,10 +5,6 @@ An Emacs dynamic module exposing [tree-sitter][1].
 A list of functions and information on whether they have been exposed
 to Elisp is available in [todo.org](todo.org).
 
-The interface to the module is not settled. The binding code is in
-early stages and will need a fair bit of cleanup to fix
-inconsistencies and patch likely bugs.
-
 The bindings are relatively plain transfers of the tree-sitter C
 API. Few, if any, convenience wrappers are provided although some may
 be added later. That said, the intention is that all types and
@@ -16,6 +12,13 @@ functions provided by the module should be safe to call and they
 should not crash Emacs. The values returned by the module are also
 intended to be garbage collected by Emacs, so no manual memory
 management functions from tree-sitter will be directly exposed.
+
+The interface to the module is *not settled*. The binding code is in
+early stages and will need a fair bit of cleanup to fix
+inconsistencies and patch likely bugs. Function names and signatures
+may change in a later pass. The interface is currently verbose and
+ideally the names will be compacted and the interface cleaned up in
+the future.
 
 ## Installation
 The installation is currently involved, particularly because this
