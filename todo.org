@@ -2,7 +2,7 @@
 #+OPTIONS: ^:nil
 
 ** API Categories
-*** Parser [23%]
+*** Parser [29%]
 - [X] ts_parser_new
 - [X] ts_parser_delete
 - [X] ts_parser_language
@@ -11,7 +11,7 @@
 - [ ] ts_parser_set_logger
 - [ ] ts_parser_print_dot_graphs
 - [ ] ts_parser_halt_on_error
-- [ ] ts_parser_parse
+- [X] ts_parser_parse
 - [ ] ts_parser_parse_string
 - [ ] ts_parser_enabled
 - [ ] ts_parser_set_enabled
@@ -20,9 +20,9 @@
 - [ ] ts_parser_reset
 - [ ] ts_parser_set_included_ranges
 - [ ] ts_parser_included_ranges
-*** Tree [0%]
+*** Tree [14%]
 - [ ] ts_tree_copy
-- [ ] ts_tree_delete
+- [X] ts_tree_delete
 - [ ] ts_tree_root_node
 - [ ] ts_tree_edit
 - [ ] ts_tree_get_changed_ranges
