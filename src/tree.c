@@ -25,8 +25,24 @@ static void tsel_tree_fin(void *ptr) {
   tsel_tree_release(tree);
 }
 
+char *tsel_tree_p_wrapped_doc = "Return t if OBJECT is a tree-sitter-tree.\n"
+  "\n"
+  "(fn OBJECT)";
+static emacs_value tsel_tree_p_wrapped(emacs_env *env,
+                                       __attribute__((unused)) ptrdiff_t nargs,
+                                       emacs_value *args,
+                                       __attribute__((unused)) void *data) {
+  if(tsel_tree_p(env, args[0])) {
+    return tsel_Qt;
+  }
+  return tsel_Qnil;
+}
+
 bool tsel_tree_init(emacs_env *env) {
-  return true;
+  bool function_result = tsel_define_function(env, "tree-sitter-tree-p",
+                                              &tsel_tree_p_wrapped, 1, 1,
+                                              tsel_tree_p_wrapped_doc, NULL);
+  return function_result;
 }
 
 TSElTree *tsel_tree_wrap(TSTree *tree) {
