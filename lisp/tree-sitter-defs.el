@@ -39,6 +39,11 @@ Users should not call this function."
 Users should not call this function."
   (record 'tree-sitter-parser ptr))
 
+(defun tree-sitter-tree--create (ptr)
+  "Create a new tree-sitter-tree record.
+Users should not call this function."
+  (record 'tree-sitter-tree ptr))
+
 (defun tree-sitter--coerce-byte (buf byte-pos)
   "Coerce a byte BYTE-POS into a valid buffer location within BUF.
 Users should not call this function."
