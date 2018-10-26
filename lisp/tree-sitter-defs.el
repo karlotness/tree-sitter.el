@@ -63,7 +63,7 @@ Users should not call this function."
       (let* ((disable-point-adjustment t)
              (start (tree-sitter--coerce-byte buf byte-pos))
              (end (tree-sitter--coerce-byte buf (+ byte-pos read-len))))
-        (buffer-substring start end)))))
+        (buffer-substring-no-properties start end)))))
 
 (provide 'tree-sitter-defs)
 ;;; tree-sitter-defs.el ends here
