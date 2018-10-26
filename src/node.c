@@ -18,6 +18,7 @@
  * <https://www.gnu.org/licenses/>.
  */
 #include <stdlib.h>
+#include <string.h>
 #include "node.h"
 #include "common.h"
 #include "symbol.h"
@@ -65,6 +66,29 @@ static emacs_value tsel_node_symbol(emacs_env *env,
   return obj;
 }
 
+static char *tsel_node_type_doc = "Return the type of node NODE.\n"
+  "The node's type is a string, the same as the name of its symbol\n"
+  "under the tree's language. See `tree-sitter-language-symbol-name'.\n"
+  "\n"
+  "(fn NODE)";
+static emacs_value tsel_node_type(emacs_env *env,
+                                  __attribute__((unused)) ptrdiff_t nargs,
+                                    emacs_value *args,
+                                    __attribute__((unused)) void *data) {
+  if(!tsel_node_p(env, args[0])) {
+    tsel_signal_wrong_type(env, "tree-sitter-node-p", args[0]);
+    return tsel_Qnil;
+  }
+  TSElNode *node = tsel_node_get_ptr(env, args[0]);
+  if(!node || tsel_pending_nonlocal_exit(env)) {
+    tsel_signal_error(env, "Failed to retrieve node.");
+    return tsel_Qnil;
+  }
+  const char *name = ts_node_type(node->node);
+  emacs_value str = env->make_string(env, name, strlen(name));
+  return str;
+}
+
 bool tsel_node_init(emacs_env *env) {
   bool function_result = tsel_define_function(env, "tree-sitter-node-p",
                                               &tsel_node_p_wrapped, 1, 1,
@@ -72,6 +96,9 @@ bool tsel_node_init(emacs_env *env) {
   function_result &= tsel_define_function(env, "tree-sitter-node-symbol",
                                           &tsel_node_symbol, 1, 1,
                                           tsel_node_symbol_doc, NULL);
+  function_result &= tsel_define_function(env, "tree-sitter-node-type",
+                                          &tsel_node_type, 1, 1,
+                                          tsel_node_type_doc, NULL);
   return function_result;
 }
 
