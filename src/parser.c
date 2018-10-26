@@ -21,6 +21,7 @@
 #include <string.h>
 #include "parser.h"
 #include "common.h"
+#include "tree.h"
 
 #define TSEL_PARSE_CHAR_BUFFER_SIZE 500
 static char tsel_parser_char_buffer[TSEL_PARSE_CHAR_BUFFER_SIZE + 1];
@@ -129,7 +130,7 @@ char *tsel_parser_parse_buffer_doc = "Use parser PARSE on buffer BUF.\n"
   "\n"
   "(fn PARSE BUF &optional TREE)";
 static emacs_value tsel_parser_parse_buffer(emacs_env *env,
-                                            __attribute__((unused)) ptrdiff_t nargs,
+                                            ptrdiff_t nargs,
                                             emacs_value *args,
                                             __attribute__((unused)) void *data) {
   if(!tsel_parser_p(env, args[0])) {
@@ -143,15 +144,39 @@ static emacs_value tsel_parser_parse_buffer(emacs_env *env,
     tsel_signal_wrong_type(env, "bufferp", args[1]);
     return tsel_Qnil;
   }
-  // TODO: handle tree case
+  TSTree *tree = NULL;
+  // If we have a third arg, make sure it is a tree
+  if(nargs >= 3 && !env->eq(env, tsel_Qnil, args[2])) {
+    if(!tsel_tree_p(env, args[2]) || tsel_pending_nonlocal_exit(env)) {
+      tsel_signal_wrong_type(env, "tree-sitter-tree-p", args[2]);
+      return tsel_Qnil;
+    }
+    else {
+      TSElTree *init_tree = tsel_tree_get_ptr(env, args[2]);
+      if(init_tree) {
+        tree = init_tree->tree;
+      }
+    }
+    if(tsel_pending_nonlocal_exit(env)) {
+      tsel_signal_error(env, "Failed to get tree");
+      return tsel_Qnil;
+    }
+  }
   struct tsel_parser_buffer_payload payload = {.env = env,
                                                .buffer = args[1]};
   TSInput input_def = {.payload = &payload,
                        .encoding = TSInputEncodingUTF8,
                        .read = &tsel_parser_read_buffer_function};
   TSParser *parse = tsel_parser_get_ptr(env, args[0])->parser;
-  ts_parser_parse(parse, NULL, input_def);
-  return tsel_Qt;
+  TSTree *new_tree = ts_parser_parse(parse, tree, input_def);
+  TSElTree *wrapped_tree = tsel_tree_wrap(new_tree);
+  emacs_value emacs_tree = tsel_tree_emacs_move(env, wrapped_tree);
+  if(!wrapped_tree || tsel_pending_nonlocal_exit(env)) {
+    tsel_tree_release(wrapped_tree);
+    tsel_signal_error(env, "Failed to initialize new tree");
+    return tsel_Qnil;
+  }
+  return emacs_tree;
 }
 
 
