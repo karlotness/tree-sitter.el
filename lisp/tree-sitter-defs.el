@@ -49,7 +49,7 @@ Users should not call this function."
 Users should not call this function."
   (with-current-buffer buf
     (cond ((< byte-pos 0) (point-min))
-          ((byte-to-position (1+ byte-pos)) (byte-to-position (1+ byte-pos)))
+          ((byte-to-position byte-pos) (byte-to-position byte-pos))
           (t (save-restriction
                (widen)
                (point-max))))))

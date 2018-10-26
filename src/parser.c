@@ -110,7 +110,7 @@ static const char *tsel_parser_read_buffer_function(void *payload, uint32_t byte
   emacs_env *env = buf_payload->env;
   emacs_value buffer = buf_payload->buffer;
   // Call our buffer function to get a string
-  emacs_value byte_pos = env->make_integer(env, byte_index);
+  emacs_value byte_pos = env->make_integer(env, byte_index + 1);
   // Leave one char left over so Emacs doesn't complain about the buffer size
   emacs_value args[3] = { buffer, byte_pos, emacs_buffer_read_length };
   emacs_value str = env->funcall(env, Qts_buffer_substring, 3, args);
