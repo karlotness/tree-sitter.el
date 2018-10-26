@@ -19,10 +19,31 @@
  */
 #include <stdlib.h>
 #include "node.h"
+#include "common.h"
 
 static void tsel_node_fin(void *ptr) {
   TSElNode *node = ptr;
   tsel_node_free(node);
+}
+
+char *tsel_node_p_wrapped_doc = "Return t if OBJECT is a tree-sitter-node.\n"
+  "\n"
+  "(fn OBJECT)";
+static emacs_value tsel_node_p_wrapped(emacs_env *env,
+                                       __attribute__((unused)) ptrdiff_t nargs,
+                                       emacs_value *args,
+                                       __attribute__((unused)) void *data) {
+  if(tsel_node_p(env, args[0])) {
+    return tsel_Qt;
+  }
+  return tsel_Qnil;
+}
+
+bool tsel_node_init(emacs_env *env) {
+  bool function_result = tsel_define_function(env, "tree-sitter-node-p",
+                                              &tsel_node_p_wrapped, 1, 1,
+                                              tsel_node_p_wrapped_doc, NULL);
+  return function_result;
 }
 
 TSElNode *tsel_node_wrap(TSNode node, TSElTree *tree) {
@@ -49,4 +70,42 @@ emacs_value tsel_node_emacs_move(emacs_env *env, TSElNode *tree) {
   emacs_value user_ptr = env->make_user_ptr(env, &tsel_node_fin, tree);
   emacs_value func_args[1] = { user_ptr };
   return env->funcall(env, Qts_language_create, 1, func_args);
+}
+
+bool tsel_node_p(emacs_env *env, emacs_value obj) {
+  if(!tsel_check_record_type(env, "tree-sitter-node", obj)) {
+    return false;
+  }
+  // Get the ptr field
+  emacs_value user_ptr;
+  if(!tsel_record_get_field(env, obj, 1, &user_ptr)) {
+    return false;
+  }
+  // Make sure it's a user pointer
+  emacs_value Quser_ptrp = env->intern(env, "user-ptrp");
+  emacs_value args[1] = { user_ptr };
+  if(!env->eq(env, env->funcall(env, Quser_ptrp, 1, args), tsel_Qt) ||
+     tsel_pending_nonlocal_exit(env)) {
+    return false;
+  }
+  // Check the finalizer
+  emacs_finalizer *fin = env->get_user_finalizer(env, user_ptr);
+  return !tsel_pending_nonlocal_exit(env) && fin == &tsel_node_fin;
+}
+
+TSElNode *tsel_node_get_ptr(emacs_env *env, emacs_value obj) {
+  if(!tsel_node_p(env, obj)) {
+    return NULL;
+  }
+  // Get the ptr field
+  emacs_value user_ptr;
+  if(!tsel_record_get_field(env, obj, 1, &user_ptr)) {
+    return NULL;
+  }
+  // Get the raw pointer
+  TSElNode *ptr = env->get_user_ptr(env, user_ptr);
+  if(tsel_pending_nonlocal_exit(env)) {
+    return NULL;
+  }
+  return ptr;
 }

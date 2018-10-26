@@ -30,8 +30,11 @@ typedef struct TSElNode {
   TSElTree *tree;
 } TSElNode;
 
+bool tsel_node_init(emacs_env *env);
 TSElNode *tsel_node_wrap(TSNode node, TSElTree *tree);
 void tsel_node_free(TSElNode *node);
 emacs_value tsel_node_emacs_move(emacs_env *env, TSElNode *node);
+bool tsel_node_p(emacs_env *env, emacs_value obj);
+TSElNode *tsel_node_get_ptr(emacs_env *env, emacs_value obj);
 
 #endif //ifndef TSEL_NODE_H
