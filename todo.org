@@ -2,14 +2,15 @@
 #+OPTIONS: ^:nil
 
 ** API Categories
-*** Parser [29%]
+*** Parser [35%]
 - [X] ts_parser_new
 - [X] ts_parser_delete
 - [X] ts_parser_language
 - [X] ts_parser_set_language
 - [ ] ts_parser_logger
 - [ ] ts_parser_set_logger
-- [ ] ts_parser_print_dot_graphs
+- [X] ts_parser_print_dot_graphs
+  - Not implementing. Requires specifying a ~FILE *~ pointer.
 - [ ] ts_parser_halt_on_error
 - [X] ts_parser_parse
 - [ ] ts_parser_parse_string
@@ -20,22 +21,25 @@
 - [ ] ts_parser_reset
 - [ ] ts_parser_set_included_ranges
 - [ ] ts_parser_included_ranges
-*** Tree [28%]
+*** Tree [42%]
 - [ ] ts_tree_copy
 - [X] ts_tree_delete
 - [X] ts_tree_root_node
 - [ ] ts_tree_edit
 - [ ] ts_tree_get_changed_ranges
-- [ ] ts_tree_print_dot_graph
+- [X] ts_tree_print_dot_graph
+  - Not implementing. Requires specifying a ~FILE *~ pointer.
 - [ ] ts_tree_language
-*** Node [6%]
+*** Node [10%]
 - [ ] ts_node_start_byte
 - [ ] ts_node_start_point
 - [ ] ts_node_end_byte
 - [ ] ts_node_end_point
 - [X] ts_node_symbol
 - [X] ts_node_type
-- [ ] ts_node_string
+- [X] ts_node_string
+  - Not implementing. Seems to just return sexpr representation of
+    subtree.
 - [ ] ts_node_eq
 - [ ] ts_node_is_null
 - [ ] ts_node_is_named
