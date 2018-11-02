@@ -363,6 +363,76 @@ static emacs_value tsel_node_child(emacs_env *env,
   return tsel_node_emacs_move(env, wrapped);
 }
 
+static char *tsel_node_next_sibling_doc = "Return next sibling of NODE.\n"
+  "If TYPE is nil, t, or unspecified include all siblings. Otherwise, if\n"
+  "TYPE is the symbol 'named include only named siblings.\n"
+  "The behavior of other values for TYPE is unspecified and may change.\n"
+  "\n"
+  "(fn NODE &optional TYPE)";
+static emacs_value tsel_node_next_sibling(emacs_env *env,
+                                          ptrdiff_t nargs,
+                                          emacs_value *args,
+                                          __attribute__((unused)) void *data) {
+  if(!tsel_node_p(env, args[0])) {
+    tsel_signal_wrong_type(env, "tree-sitter-node-p", args[0]);
+    return tsel_Qnil;
+  }
+  TSElNode *node = tsel_node_get_ptr(env, args[0]);
+  if(!node || tsel_pending_nonlocal_exit(env)) {
+    tsel_signal_error(env, "Failed to retrieve node.");
+    return tsel_Qnil;
+  }
+  bool count_named = nargs > 1 && tsel_named_nodes(env, args[1]);
+  TSNode sibling;
+  if(count_named) {
+    sibling = ts_node_next_named_sibling(node->node);
+  }
+  else {
+    sibling = ts_node_next_sibling(node->node);
+  }
+  TSElNode *wrapped = tsel_node_wrap(sibling, node->tree);
+  if(!wrapped) {
+    tsel_signal_error(env, "Allocation failed.");
+    return tsel_Qnil;
+  }
+  return tsel_node_emacs_move(env, wrapped);
+}
+
+static char *tsel_node_prev_sibling_doc = "Return previous sibling of NODE.\n"
+  "If TYPE is nil, t, or unspecified include all siblings. Otherwise, if\n"
+  "TYPE is the symbol 'named include only named siblings.\n"
+  "The behavior of other values for TYPE is unspecified and may change.\n"
+  "\n"
+  "(fn NODE &optional TYPE)";
+static emacs_value tsel_node_prev_sibling(emacs_env *env,
+                                          ptrdiff_t nargs,
+                                          emacs_value *args,
+                                          __attribute__((unused)) void *data) {
+  if(!tsel_node_p(env, args[0])) {
+    tsel_signal_wrong_type(env, "tree-sitter-node-p", args[0]);
+    return tsel_Qnil;
+  }
+  TSElNode *node = tsel_node_get_ptr(env, args[0]);
+  if(!node || tsel_pending_nonlocal_exit(env)) {
+    tsel_signal_error(env, "Failed to retrieve node.");
+    return tsel_Qnil;
+  }
+  bool count_named = nargs > 1 && tsel_named_nodes(env, args[1]);
+  TSNode sibling;
+  if(count_named) {
+    sibling = ts_node_prev_named_sibling(node->node);
+  }
+  else {
+    sibling = ts_node_prev_sibling(node->node);
+  }
+  TSElNode *wrapped = tsel_node_wrap(sibling, node->tree);
+  if(!wrapped) {
+    tsel_signal_error(env, "Allocation failed.");
+    return tsel_Qnil;
+  }
+  return tsel_node_emacs_move(env, wrapped);
+}
+
 static char *tsel_node_has_error_doc = "Return non-nil if NODE has an error.\n"
   "\n"
   "(fn NODE)";
@@ -431,6 +501,12 @@ bool tsel_node_init(emacs_env *env) {
   function_result &= tsel_define_function(env, "tree-sitter-node-child",
                                           &tsel_node_child, 2, 3,
                                           tsel_node_child_doc, NULL);
+  function_result &= tsel_define_function(env, "tree-sitter-node-next-sibling",
+                                          &tsel_node_next_sibling, 1, 2,
+                                          tsel_node_next_sibling_doc, NULL);
+  function_result &= tsel_define_function(env, "tree-sitter-node-prev-sibling",
+                                          &tsel_node_prev_sibling, 1, 2,
+                                          tsel_node_prev_sibling_doc, NULL);
   return function_result;
 }
 
