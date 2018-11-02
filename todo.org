@@ -30,7 +30,7 @@
 - [X] ts_tree_print_dot_graph
   - Not implementing. Requires specifying a ~FILE *~ pointer.
 - [ ] ts_tree_language
-*** Node [44%]
+*** Node [48%]
 - [X] ts_node_start_byte
 - [X] ts_node_start_point
 - [X] ts_node_end_byte
@@ -47,7 +47,7 @@
 - [X] ts_node_is_missing
 - [X] ts_node_has_changes
 - [X] ts_node_has_error
-- [ ] ts_node_parent
+- [X] ts_node_parent
 - [ ] ts_node_child
 - [ ] ts_node_named_child
 - [ ] ts_node_child_count
