@@ -74,8 +74,8 @@ static char *tsel_node_type_doc = "Return the type of node NODE.\n"
   "(fn NODE)";
 static emacs_value tsel_node_type(emacs_env *env,
                                   __attribute__((unused)) ptrdiff_t nargs,
-                                    emacs_value *args,
-                                    __attribute__((unused)) void *data) {
+                                  emacs_value *args,
+                                  __attribute__((unused)) void *data) {
   if(!tsel_node_p(env, args[0])) {
     tsel_signal_wrong_type(env, "tree-sitter-node-p", args[0]);
     return tsel_Qnil;
@@ -94,9 +94,9 @@ static char *tsel_node_start_byte_doc = "Return the starting byte of a tree-sitt
   "\n"
   "(fn NODE)";
 static emacs_value tsel_node_start_byte(emacs_env *env,
-                                  __attribute__((unused)) ptrdiff_t nargs,
-                                    emacs_value *args,
-                                    __attribute__((unused)) void *data) {
+                                        __attribute__((unused)) ptrdiff_t nargs,
+                                        emacs_value *args,
+                                        __attribute__((unused)) void *data) {
   if(!tsel_node_p(env, args[0])) {
     tsel_signal_wrong_type(env, "tree-sitter-node-p", args[0]);
     return tsel_Qnil;
@@ -114,9 +114,9 @@ static char *tsel_node_end_byte_doc = "Return the ending byte of a tree-sitter n
   "\n"
   "(fn NODE)";
 static emacs_value tsel_node_end_byte(emacs_env *env,
-                                  __attribute__((unused)) ptrdiff_t nargs,
-                                    emacs_value *args,
-                                    __attribute__((unused)) void *data) {
+                                      __attribute__((unused)) ptrdiff_t nargs,
+                                      emacs_value *args,
+                                      __attribute__((unused)) void *data) {
   if(!tsel_node_p(env, args[0])) {
     tsel_signal_wrong_type(env, "tree-sitter-node-p", args[0]);
     return tsel_Qnil;
@@ -136,9 +136,9 @@ static char *tsel_node_start_point_doc = "Return the starting point of NODE.\n"
   "\n"
   "(fn NODE)";
 static emacs_value tsel_node_start_point(emacs_env *env,
-                                  __attribute__((unused)) ptrdiff_t nargs,
-                                    emacs_value *args,
-                                    __attribute__((unused)) void *data) {
+                                         __attribute__((unused)) ptrdiff_t nargs,
+                                         emacs_value *args,
+                                         __attribute__((unused)) void *data) {
   if(!tsel_node_p(env, args[0])) {
     tsel_signal_wrong_type(env, "tree-sitter-node-p", args[0]);
     return tsel_Qnil;
@@ -158,9 +158,9 @@ static char *tsel_node_end_point_doc = "Return the ending point of NODE.\n"
   "\n"
   "(fn NODE)";
 static emacs_value tsel_node_end_point(emacs_env *env,
-                                  __attribute__((unused)) ptrdiff_t nargs,
-                                    emacs_value *args,
-                                    __attribute__((unused)) void *data) {
+                                       __attribute__((unused)) ptrdiff_t nargs,
+                                       emacs_value *args,
+                                       __attribute__((unused)) void *data) {
   if(!tsel_node_p(env, args[0])) {
     tsel_signal_wrong_type(env, "tree-sitter-node-p", args[0]);
     return tsel_Qnil;
