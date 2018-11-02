@@ -30,11 +30,11 @@
 - [X] ts_tree_print_dot_graph
   - Not implementing. Requires specifying a ~FILE *~ pointer.
 - [ ] ts_tree_language
-*** Node [17%]
+*** Node [24%]
 - [X] ts_node_start_byte
-- [ ] ts_node_start_point
+- [X] ts_node_start_point
 - [X] ts_node_end_byte
-- [ ] ts_node_end_point
+- [X] ts_node_end_point
 - [X] ts_node_symbol
 - [X] ts_node_type
 - [X] ts_node_string

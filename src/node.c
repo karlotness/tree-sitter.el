@@ -22,6 +22,7 @@
 #include "node.h"
 #include "common.h"
 #include "symbol.h"
+#include "point.h"
 
 static void tsel_node_fin(void *ptr) {
   TSElNode *node = ptr;
@@ -129,6 +130,50 @@ static emacs_value tsel_node_end_byte(emacs_env *env,
   return env->make_integer(env, byte + 1);
 }
 
+static char *tsel_node_start_point_doc = "Return the starting point of NODE.\n"
+  "The point is a pair of row and column collected into a\n"
+  "tree-sitter-point record.\n"
+  "\n"
+  "(fn NODE)";
+static emacs_value tsel_node_start_point(emacs_env *env,
+                                  __attribute__((unused)) ptrdiff_t nargs,
+                                    emacs_value *args,
+                                    __attribute__((unused)) void *data) {
+  if(!tsel_node_p(env, args[0])) {
+    tsel_signal_wrong_type(env, "tree-sitter-node-p", args[0]);
+    return tsel_Qnil;
+  }
+  TSElNode *node = tsel_node_get_ptr(env, args[0]);
+  if(!node || tsel_pending_nonlocal_exit(env)) {
+    tsel_signal_error(env, "Failed to retrieve node.");
+    return tsel_Qnil;
+  }
+  TSPoint point = ts_node_start_point(node->node);
+  return tsel_point_emacs_move(env, &point);
+}
+
+static char *tsel_node_end_point_doc = "Return the ending point of NODE.\n"
+  "The point is a pair of row and column collected into a\n"
+  "tree-sitter-point record.\n"
+  "\n"
+  "(fn NODE)";
+static emacs_value tsel_node_end_point(emacs_env *env,
+                                  __attribute__((unused)) ptrdiff_t nargs,
+                                    emacs_value *args,
+                                    __attribute__((unused)) void *data) {
+  if(!tsel_node_p(env, args[0])) {
+    tsel_signal_wrong_type(env, "tree-sitter-node-p", args[0]);
+    return tsel_Qnil;
+  }
+  TSElNode *node = tsel_node_get_ptr(env, args[0]);
+  if(!node || tsel_pending_nonlocal_exit(env)) {
+    tsel_signal_error(env, "Failed to retrieve node.");
+    return tsel_Qnil;
+  }
+  TSPoint point = ts_node_end_point(node->node);
+  return tsel_point_emacs_move(env, &point);
+}
+
 bool tsel_node_init(emacs_env *env) {
   bool function_result = tsel_define_function(env, "tree-sitter-node-p",
                                               &tsel_node_p_wrapped, 1, 1,
@@ -145,6 +190,12 @@ bool tsel_node_init(emacs_env *env) {
   function_result &= tsel_define_function(env, "tree-sitter-node-end-byte",
                                           &tsel_node_end_byte, 1, 1,
                                           tsel_node_end_byte_doc, NULL);
+  function_result &= tsel_define_function(env, "tree-sitter-node-start-point",
+                                          &tsel_node_start_point, 1, 1,
+                                          tsel_node_start_point_doc, NULL);
+  function_result &= tsel_define_function(env, "tree-sitter-node-end-point",
+                                          &tsel_node_end_point, 1, 1,
+                                          tsel_node_end_point_doc, NULL);
   return function_result;
 }
 
