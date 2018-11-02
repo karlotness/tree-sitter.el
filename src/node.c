@@ -266,6 +266,28 @@ static emacs_value tsel_node_is_missing(emacs_env *env,
   return tsel_Qnil;
 }
 
+static char *tsel_node_has_changes_doc = "Return non-nil if NODE has changes.\n"
+  "\n"
+  "(fn NODE)";
+static emacs_value tsel_node_has_changes(emacs_env *env,
+                                         __attribute__((unused)) ptrdiff_t nargs,
+                                         emacs_value *args,
+                                         __attribute__((unused)) void *data) {
+  if(!tsel_node_p(env, args[0])) {
+    tsel_signal_wrong_type(env, "tree-sitter-node-p", args[0]);
+    return tsel_Qnil;
+  }
+  TSElNode *node = tsel_node_get_ptr(env, args[0]);
+  if(!node || tsel_pending_nonlocal_exit(env)) {
+    tsel_signal_error(env, "Failed to retrieve node.");
+    return tsel_Qnil;
+  }
+  if(ts_node_has_changes(node->node)) {
+    return tsel_Qt;
+  }
+  return tsel_Qnil;
+}
+
 bool tsel_node_init(emacs_env *env) {
   bool function_result = tsel_define_function(env, "tree-sitter-node-p",
                                               &tsel_node_p_wrapped, 1, 1,
@@ -300,6 +322,9 @@ bool tsel_node_init(emacs_env *env) {
   function_result &= tsel_define_function(env, "tree-sitter-node-missing-p",
                                           &tsel_node_is_missing, 1, 1,
                                           tsel_node_is_missing_doc, NULL);
+  function_result &= tsel_define_function(env, "tree-sitter-node-has-changes-p",
+                                          &tsel_node_has_changes, 1, 1,
+                                          tsel_node_has_changes_doc, NULL);
   return function_result;
 }
 
