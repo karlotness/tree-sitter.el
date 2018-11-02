@@ -69,6 +69,33 @@ static emacs_value tsel_tree_root_node(emacs_env *env,
   return res;
 }
 
+static char *tsel_tree_copy_doc = "Return a shallow copy of TREE.\n"
+  "\n"
+  "(fn TREE)";
+static emacs_value tsel_tree_copy(emacs_env *env,
+                                       __attribute__((unused)) ptrdiff_t nargs,
+                                       emacs_value *args,
+                                       __attribute__((unused)) void *data) {
+  if(!tsel_tree_p(env, args[0])) {
+    tsel_signal_wrong_type(env, "tree-sitter-tree-p", args[0]);
+    return tsel_Qnil;
+  }
+  TSElTree *tree = tsel_tree_get_ptr(env, args[0]);
+  if(!tree) {
+    tsel_signal_error(env, "Failed to get tree.");
+    return tsel_Qnil;
+  }
+  TSTree *new_tree = ts_tree_copy(tree->tree);
+  TSElTree *wrapped_tree = tsel_tree_wrap(new_tree);
+  emacs_value emacs_tree = tsel_tree_emacs_move(env, wrapped_tree);
+  if(!wrapped_tree || tsel_pending_nonlocal_exit(env)) {
+    tsel_tree_release(wrapped_tree);
+    tsel_signal_error(env, "Failed to initialize new tree");
+    return tsel_Qnil;
+  }
+  return emacs_tree;
+}
+
 bool tsel_tree_init(emacs_env *env) {
   bool function_result = tsel_define_function(env, "tree-sitter-tree-p",
                                               &tsel_tree_p_wrapped, 1, 1,
@@ -76,6 +103,9 @@ bool tsel_tree_init(emacs_env *env) {
   function_result &= tsel_define_function(env, "tree-sitter-tree-root-node",
                                           &tsel_tree_root_node, 1, 1,
                                           tsel_tree_root_node_doc, NULL);
+  function_result &= tsel_define_function(env, "tree-sitter-tree-copy",
+                                          &tsel_tree_copy, 1, 1,
+                                          tsel_tree_copy_doc, NULL);
   return function_result;
 }
 
