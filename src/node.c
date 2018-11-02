@@ -89,6 +89,46 @@ static emacs_value tsel_node_type(emacs_env *env,
   return str;
 }
 
+static char *tsel_node_start_byte_doc = "Return the starting byte of a tree-sitter node.\n"
+  "\n"
+  "(fn NODE)";
+static emacs_value tsel_node_start_byte(emacs_env *env,
+                                  __attribute__((unused)) ptrdiff_t nargs,
+                                    emacs_value *args,
+                                    __attribute__((unused)) void *data) {
+  if(!tsel_node_p(env, args[0])) {
+    tsel_signal_wrong_type(env, "tree-sitter-node-p", args[0]);
+    return tsel_Qnil;
+  }
+  TSElNode *node = tsel_node_get_ptr(env, args[0]);
+  if(!node || tsel_pending_nonlocal_exit(env)) {
+    tsel_signal_error(env, "Failed to retrieve node.");
+    return tsel_Qnil;
+  }
+  uint32_t byte = ts_node_start_byte(node->node);
+  return env->make_integer(env, byte + 1);
+}
+
+static char *tsel_node_end_byte_doc = "Return the ending byte of a tree-sitter node.\n"
+  "\n"
+  "(fn NODE)";
+static emacs_value tsel_node_end_byte(emacs_env *env,
+                                  __attribute__((unused)) ptrdiff_t nargs,
+                                    emacs_value *args,
+                                    __attribute__((unused)) void *data) {
+  if(!tsel_node_p(env, args[0])) {
+    tsel_signal_wrong_type(env, "tree-sitter-node-p", args[0]);
+    return tsel_Qnil;
+  }
+  TSElNode *node = tsel_node_get_ptr(env, args[0]);
+  if(!node || tsel_pending_nonlocal_exit(env)) {
+    tsel_signal_error(env, "Failed to retrieve node.");
+    return tsel_Qnil;
+  }
+  uint32_t byte = ts_node_end_byte(node->node);
+  return env->make_integer(env, byte + 1);
+}
+
 bool tsel_node_init(emacs_env *env) {
   bool function_result = tsel_define_function(env, "tree-sitter-node-p",
                                               &tsel_node_p_wrapped, 1, 1,
@@ -99,6 +139,12 @@ bool tsel_node_init(emacs_env *env) {
   function_result &= tsel_define_function(env, "tree-sitter-node-type",
                                           &tsel_node_type, 1, 1,
                                           tsel_node_type_doc, NULL);
+  function_result &= tsel_define_function(env, "tree-sitter-node-start-byte",
+                                          &tsel_node_start_byte, 1, 1,
+                                          tsel_node_start_byte_doc, NULL);
+  function_result &= tsel_define_function(env, "tree-sitter-node-end-byte",
+                                          &tsel_node_end_byte, 1, 1,
+                                          tsel_node_end_byte_doc, NULL);
   return function_result;
 }
 
