@@ -373,6 +373,10 @@ void tsel_node_free(TSElNode *node) {
 }
 
 emacs_value tsel_node_emacs_move(emacs_env *env, TSElNode *tree) {
+  if(ts_node_is_null(tree->node)) {
+    tsel_node_fin(tree);
+    return tsel_Qnil;
+  }
   emacs_value Qts_language_create = env->intern(env, "tree-sitter-node--create");
   emacs_value user_ptr = env->make_user_ptr(env, &tsel_node_fin, tree);
   emacs_value func_args[1] = { user_ptr };
