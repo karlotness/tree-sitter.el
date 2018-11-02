@@ -29,6 +29,10 @@ static void tsel_node_fin(void *ptr) {
   tsel_node_free(node);
 }
 
+static bool tsel_named_nodes(emacs_env *env, emacs_value arg) {
+  return env->eq(env, arg, env->intern(env, "named"));
+}
+
 static char *tsel_node_p_wrapped_doc = "Return t if OBJECT is a tree-sitter-node.\n"
   "\n"
   "(fn OBJECT)";
@@ -287,6 +291,32 @@ static emacs_value tsel_node_parent(emacs_env *env,
   return tsel_node_emacs_move(env, wrapped);
 }
 
+static char *tsel_node_child_count_doc = "Return the number of children of NODE.\n"
+  "If TYPE is nil, t, or unspecified count all children. Otherwise if\n"
+  "TYPE is the symbol 'named count only named children.\n"
+  "The behavior of other values for TYPE is unspecified and may change.\n"
+  "\n"
+  "(fn NODE &optional TYPE)";
+static emacs_value tsel_node_child_count(emacs_env *env,
+                                         ptrdiff_t nargs,
+                                         emacs_value *args,
+                                         __attribute__((unused)) void *data) {
+  if(!tsel_node_p(env, args[0])) {
+    tsel_signal_wrong_type(env, "tree-sitter-node-p", args[0]);
+    return tsel_Qnil;
+  }
+  TSElNode *node = tsel_node_get_ptr(env, args[0]);
+  if(!node || tsel_pending_nonlocal_exit(env)) {
+    tsel_signal_error(env, "Failed to retrieve node.");
+    return tsel_Qnil;
+  }
+  bool count_named = nargs > 1 && tsel_named_nodes(env, args[1]);
+  if(count_named) {
+    return env->make_integer(env, ts_node_named_child_count(node->node));
+  }
+  return env->make_integer(env, ts_node_child_count(node->node));
+}
+
 static char *tsel_node_has_error_doc = "Return non-nil if NODE has an error.\n"
   "\n"
   "(fn NODE)";
@@ -349,6 +379,9 @@ bool tsel_node_init(emacs_env *env) {
   function_result &= tsel_define_function(env, "tree-sitter-node-parent",
                                           &tsel_node_parent, 1, 1,
                                           tsel_node_parent_doc, NULL);
+  function_result &= tsel_define_function(env, "tree-sitter-node-child-count",
+                                          &tsel_node_child_count, 1, 2,
+                                          tsel_node_child_count_doc, NULL);
   return function_result;
 }
 
