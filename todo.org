@@ -42,6 +42,7 @@
     subtree.
 - [X] ts_node_eq
 - [X] ts_node_is_null
+  - Not implementing. Module converts null nodes to nil.
 - [X] ts_node_is_named
 - [X] ts_node_is_missing
 - [X] ts_node_has_changes

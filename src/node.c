@@ -200,28 +200,6 @@ static emacs_value tsel_node_eq(emacs_env *env,
   return tsel_Qnil;
 }
 
-static char *tsel_node_is_null_doc = "Return non-nil if NODE is null.\n"
-  "\n"
-  "(fn NODE)";
-static emacs_value tsel_node_is_null(emacs_env *env,
-                                       __attribute__((unused)) ptrdiff_t nargs,
-                                       emacs_value *args,
-                                       __attribute__((unused)) void *data) {
-  if(!tsel_node_p(env, args[0])) {
-    tsel_signal_wrong_type(env, "tree-sitter-node-p", args[0]);
-    return tsel_Qnil;
-  }
-  TSElNode *node = tsel_node_get_ptr(env, args[0]);
-  if(!node || tsel_pending_nonlocal_exit(env)) {
-    tsel_signal_error(env, "Failed to retrieve node.");
-    return tsel_Qnil;
-  }
-  if(ts_node_is_null(node->node)) {
-    return tsel_Qt;
-  }
-  return tsel_Qnil;
-}
-
 static char *tsel_node_is_named_doc = "Return non-nil if NODE is named.\n"
   "\n"
   "(fn NODE)";
@@ -335,9 +313,6 @@ bool tsel_node_init(emacs_env *env) {
   function_result &= tsel_define_function(env, "tree-sitter-node-eq",
                                           &tsel_node_eq, 2, 2,
                                           tsel_node_eq_doc, NULL);
-  function_result &= tsel_define_function(env, "tree-sitter-node-null-p",
-                                          &tsel_node_is_null, 1, 1,
-                                          tsel_node_is_null_doc, NULL);
   function_result &= tsel_define_function(env, "tree-sitter-node-named-p",
                                           &tsel_node_is_named, 1, 1,
                                           tsel_node_is_named_doc, NULL);
