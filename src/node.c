@@ -174,6 +174,32 @@ static emacs_value tsel_node_end_point(emacs_env *env,
   return tsel_point_emacs_move(env, &point);
 }
 
+static char *tsel_node_eq_doc = "Return non-nil if tree-sitter-node A is equal to B.\n"
+  "Both arguments must be tree-sitter-node records.\n"
+  "\n"
+  "(fn A B)";
+static emacs_value tsel_node_eq(emacs_env *env,
+                                __attribute__((unused)) ptrdiff_t nargs,
+                                emacs_value *args,
+                                __attribute__((unused)) void *data) {
+  TSElNode *nodes[2];
+  for(int i = 0; i < 2; i++) {
+    if(!tsel_node_p(env, args[i])) {
+      tsel_signal_wrong_type(env, "tree-sitter-node-p", args[i]);
+      return tsel_Qnil;
+    }
+    nodes[i] = tsel_node_get_ptr(env, args[i]);
+    if(!nodes[i] || tsel_pending_nonlocal_exit(env)) {
+      tsel_signal_error(env, "Failed to retrieve node.");
+      return tsel_Qnil;
+    }
+  }
+  if(ts_node_eq(nodes[0]->node, nodes[0]->node)) {
+    return tsel_Qt;
+  }
+  return tsel_Qnil;
+}
+
 bool tsel_node_init(emacs_env *env) {
   bool function_result = tsel_define_function(env, "tree-sitter-node-p",
                                               &tsel_node_p_wrapped, 1, 1,
@@ -196,6 +222,9 @@ bool tsel_node_init(emacs_env *env) {
   function_result &= tsel_define_function(env, "tree-sitter-node-end-point",
                                           &tsel_node_end_point, 1, 1,
                                           tsel_node_end_point_doc, NULL);
+  function_result &= tsel_define_function(env, "tree-sitter-node-eq",
+                                          &tsel_node_eq, 2, 2,
+                                          tsel_node_eq_doc, NULL);
   return function_result;
 }
 
