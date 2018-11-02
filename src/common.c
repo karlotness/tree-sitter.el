@@ -133,3 +133,13 @@ void tsel_signal_error(emacs_env *env, char *message) {
   emacs_value payload = env->funcall(env, Qlist, 1, args);
   env->non_local_exit_signal(env, Qerror, payload);
 }
+
+bool tsel_integer_p(emacs_env *env, emacs_value obj) {
+  emacs_value Qstringp = env->intern(env, "integerp");
+  emacs_value args[1] = { obj };
+  if(!env->eq(env, env->funcall(env, Qstringp, 1, args), tsel_Qt) ||
+     tsel_pending_nonlocal_exit(env)) {
+    return false;
+  }
+  return true;
+}

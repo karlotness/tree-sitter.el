@@ -39,6 +39,7 @@ bool tsel_check_record_type(emacs_env *env, char *record_type, emacs_value obj);
 bool tsel_string_p(emacs_env *env, emacs_value obj);
 char *tsel_extract_string(emacs_env *env, emacs_value obj);
 void tsel_signal_error(emacs_env *env, char *message);
+bool tsel_integer_p(emacs_env *env, emacs_value obj);
 
 extern emacs_value tsel_Qnil;
 extern emacs_value tsel_Qt;
