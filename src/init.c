@@ -24,6 +24,7 @@
 #include "parser.h"
 #include "tree.h"
 #include "node.h"
+#include "point.h"
 
 // Required symbol for Emacs loading
 int plugin_is_GPL_compatible;
@@ -42,7 +43,8 @@ int emacs_module_init(struct emacs_runtime *ert) {
   // Perform initialization
   if(!tsel_common_init(env) || !tsel_language_init(env) ||
      !tsel_symbol_init(env) || !tsel_parser_init(env) ||
-     !tsel_tree_init(env) || !tsel_node_init(env)) {
+     !tsel_tree_init(env) || !tsel_node_init(env) ||
+     !tsel_point_init(env)) {
     return 1;
   }
   // Provide the module

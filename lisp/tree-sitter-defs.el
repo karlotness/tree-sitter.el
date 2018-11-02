@@ -49,6 +49,19 @@ Users should not call this function."
 Users should not call this function."
   (record 'tree-sitter-node ptr))
 
+(defun tree-sitter-point--create (row col)
+  "Create a new tree-sitter-point record.
+Users should not call this function."
+  (record 'tree-sitter-point row col))
+
+(defun tree-sitter-point-row (point)
+  "Return the row of a tree-sitter-point record, POINT."
+  (aref point 1))
+
+(defun tree-sitter-point-col (point)
+  "Return the column of a tree-sitter-point record, POINT."
+  (aref point 2))
+
 (defun tree-sitter--coerce-byte (buf byte-pos)
   "Coerce a byte BYTE-POS into a valid buffer location within BUF.
 Users should not call this function."
