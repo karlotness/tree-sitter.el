@@ -288,6 +288,10 @@ static emacs_value tsel_node_parent(emacs_env *env,
   }
   TSNode parent = ts_node_parent(node->node);
   TSElNode *wrapped = tsel_node_wrap(parent, node->tree);
+  if(!wrapped) {
+    tsel_signal_error(env, "Allocation failed.");
+    return tsel_Qnil;
+  }
   return tsel_node_emacs_move(env, wrapped);
 }
 
