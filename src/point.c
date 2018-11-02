@@ -77,6 +77,10 @@ bool tsel_point_get_values(emacs_env *env, emacs_value point, uint32_t *row, uin
     if(tsel_pending_nonlocal_exit(env)) {
       return false;
     }
+    if(i == 0) {
+      // Correct for fact that Emacs rows are indexed from 1
+      num--;
+    }
     *locs[i] = num;
   }
   return true;
@@ -85,7 +89,7 @@ bool tsel_point_get_values(emacs_env *env, emacs_value point, uint32_t *row, uin
 emacs_value tsel_point_emacs_move(emacs_env *env, const TSPoint *point) {
   emacs_value Qts_point_create = env->intern(env, "tree-sitter-point--create");
   emacs_value args[2];
-  args[0] = env->make_integer(env, point->row);
+  args[0] = env->make_integer(env, point->row + 1);
   args[1] = env->make_integer(env, point->column);
   return env->funcall(env, Qts_point_create, 2, args);
 }
