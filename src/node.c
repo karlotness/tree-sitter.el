@@ -342,6 +342,7 @@ static emacs_value tsel_node_child(emacs_env *env,
   }
   if(!tsel_integer_p(env, args[1])) {
     tsel_signal_wrong_type(env, "integerp", args[1]);
+    return tsel_Qnil;
   }
   uint32_t num = env->extract_integer(env, args[1]);
   if(tsel_pending_nonlocal_exit(env)) {
@@ -476,6 +477,7 @@ static emacs_value tsel_node_first_child_for_byte(emacs_env *env,
   }
   if(!tsel_integer_p(env, args[1])) {
     tsel_signal_wrong_type(env, "integerp", args[1]);
+    return tsel_Qnil;
   }
   uint32_t byte = env->extract_integer(env, args[1]) - 1;
   if(tsel_pending_nonlocal_exit(env)) {
