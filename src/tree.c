@@ -20,6 +20,7 @@
 #include "tree.h"
 #include "common.h"
 #include "node.h"
+#include "point.h"
 
 static void tsel_tree_fin(void *ptr) {
   TSElTree *tree = ptr;
@@ -96,6 +97,53 @@ static emacs_value tsel_tree_copy(emacs_env *env,
   return emacs_tree;
 }
 
+static char *tsel_tree_edit_doc = "Mark a portion of TREE as edited.\n"
+  "\n"
+  "(fn TREE START-BYTE OLD-END-BYTE NEW-END-BYTE START-POINT OLD-END-POINT NEW-END-POINT)";
+static emacs_value tsel_tree_edit(emacs_env *env,
+                                  __attribute__((unused)) ptrdiff_t nargs,
+                                  emacs_value *args,
+                                  __attribute__((unused)) void *data) {
+  // Check argument types
+  if(!tsel_tree_p(env, args[0])) {
+    tsel_signal_wrong_type(env, "tree-sitter-tree-p", args[0]);
+    return tsel_Qnil;
+  }
+  for(int i = 1; i < 4; i++) {
+    if(!tsel_integer_p(env, args[i])) {
+      tsel_signal_wrong_type(env, "integerp", args[i]);
+      return tsel_Qnil;
+    }
+  }
+  for(int i = 4; i < 7; i++) {
+    if(!tsel_point_p(env, args[i])) {
+      tsel_signal_wrong_type(env, "tree-sitter-point-p", args[i]);
+      return tsel_Qnil;
+    }
+  }
+  // Extract arguments
+  TSElTree *tree = tsel_tree_get_ptr(env, args[0]);
+  if(!tree) {
+    tsel_signal_error(env, "Failed to get tree.");
+    return tsel_Qnil;
+  }
+  TSInputEdit edit;
+  edit.start_byte = env->extract_integer(env, args[1]) - 1;
+  edit.old_end_byte = env->extract_integer(env, args[2]) - 1;
+  edit.new_end_byte = env->extract_integer(env, args[3]) - 1;
+  if(!tsel_point_get_values(env, args[4], &edit.start_point.row, &edit.start_point.column) ||
+     !tsel_point_get_values(env, args[5], &edit.old_end_point.row, &edit.old_end_point.column) ||
+     !tsel_point_get_values(env, args[6], &edit.new_end_point.row, &edit.new_end_point.column)) {
+    tsel_signal_error(env, "Failed to extract points.");
+  }
+  if(tsel_pending_nonlocal_exit(env)) {
+    return tsel_Qnil;
+  }
+  // Signal the edit
+  ts_tree_edit(tree->tree, &edit);
+  return tsel_Qt;
+}
+
 bool tsel_tree_init(emacs_env *env) {
   bool function_result = tsel_define_function(env, "tree-sitter-tree-p",
                                               &tsel_tree_p_wrapped, 1, 1,
@@ -106,6 +154,9 @@ bool tsel_tree_init(emacs_env *env) {
   function_result &= tsel_define_function(env, "tree-sitter-tree-copy",
                                           &tsel_tree_copy, 1, 1,
                                           tsel_tree_copy_doc, NULL);
+  function_result &= tsel_define_function(env, "tree-sitter-tree-edit",
+                                          &tsel_tree_edit, 7, 7,
+                                          tsel_tree_edit_doc, NULL);
   return function_result;
 }
 
