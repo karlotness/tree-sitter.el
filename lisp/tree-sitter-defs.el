@@ -62,6 +62,19 @@ Users should not call this function."
   "Return the column of a tree-sitter-point record, POINT."
   (aref point 2))
 
+(defun tree-sitter-position-to-point (&optional position)
+  "Convert a buffer location POSITION to a tree-sitter-point record.
+The row and column numbers computed are absolute. If POSITION is
+unspecified, use `point'"
+  (let ((position (or position (point))))
+    (save-excursion
+      (save-restriction
+        (widen)
+        (goto-char position)
+        (let ((row (line-number-at-pos))
+              (col (current-column)))
+          (tree-sitter-point--create row col))))))
+
 (defun tree-sitter--coerce-byte (buf byte-pos)
   "Coerce a byte BYTE-POS into a valid buffer location within BUF.
 Users should not call this function."
