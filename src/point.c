@@ -70,7 +70,7 @@ bool tsel_point_get_values(emacs_env *env, emacs_value point, uint32_t *row, uin
       continue;
     }
     // Get the field
-    if(!tsel_record_get_field(env, point, i, &val)) {
+    if(!tsel_record_get_field(env, point, i + 1, &val)) {
       return false;
     }
     num = env->extract_integer(env, val);
