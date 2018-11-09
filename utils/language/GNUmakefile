@@ -4,8 +4,9 @@ CXXFLAGS+=-Isrc/ -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=1 -O2
 LDFLAGS+=
 
 # Depend on the tree-sitter parser C file and the Emacs module source
-sources_c=src/parser.c lang-module.c
-sources_cc=src/scanner.cc
+sources_c=$(wildcard src/*.c) lang-module.c
+remove_sources_cc=src/binding.cc
+sources_cc=$(filter-out $(remove_sources_cc), $(wildcard src/*.cc))
 
 all: tree-sitter-lang-LANG_NAME-module.so
 
