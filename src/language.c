@@ -31,14 +31,8 @@ static emacs_value tsel_language_symbol_count(emacs_env *env,
                                               __attribute__((unused)) ptrdiff_t nargs,
                                               emacs_value *args,
                                               __attribute__((unused)) void *data) {
-  if(!tsel_language_p(env, args[0])) {
-    tsel_signal_wrong_type(env, "tree-sitter-language-p", args[0]);
-    return tsel_Qnil;
-  }
-  TSElLanguage *ptr = tsel_language_get_ptr(env, args[0]);
-  if(tsel_pending_nonlocal_exit(env)) {
-    return tsel_Qnil;
-  }
+  TSElLanguage *ptr;
+  TSEL_SUBR_EXTRACT(language, env, args[0], &ptr);
   uint32_t s_count = ts_language_symbol_count(ptr->ptr);
   return env->make_integer(env, s_count);
 }
@@ -52,21 +46,12 @@ static emacs_value tsel_language_symbol_name(emacs_env *env,
                                              __attribute__((unused)) ptrdiff_t nargs,
                                              emacs_value *args,
                                              __attribute__((unused)) void *data) {
-  if(!tsel_language_p(env, args[0])) {
-    tsel_signal_wrong_type(env, "tree-sitter-language-p", args[0]);
-    return tsel_Qnil;
-  }
-  else if(!tsel_symbol_p(env, args[1])) {
-    tsel_signal_wrong_type(env, "tree-sitter-symbol-p", args[1]);
-    return tsel_Qnil;
-  }
-  TSLanguage *lang = tsel_language_get_ptr(env, args[0])->ptr;
-  TSSymbol code = 0;
-  if(!tsel_symbol_get_code(env, args[1], &code) || tsel_pending_nonlocal_exit(env)) {
-    return tsel_Qnil;
-  }
-  else if(code < ts_language_symbol_count(lang)) {
-    const char *name = ts_language_symbol_name(lang, code);
+  TSElLanguage *lang;
+  TSSymbol code;
+  TSEL_SUBR_EXTRACT(language, env, args[0], &lang);
+  TSEL_SUBR_EXTRACT(tssymbol, env, args[1], &code);
+  if(code < ts_language_symbol_count(lang->ptr)) {
+    const char *name = ts_language_symbol_name(lang->ptr, code);
     return env->make_string(env, name, strlen(name));
   }
   return tsel_Qnil;
@@ -81,25 +66,15 @@ static emacs_value tsel_language_symbol_for_name(emacs_env *env,
                                                  __attribute__((unused)) ptrdiff_t nargs,
                                                  emacs_value *args,
                                                  __attribute__((unused)) void *data) {
-  if(!tsel_language_p(env, args[0])) {
-    tsel_signal_wrong_type(env, "tree-sitter-language-p", args[0]);
-    return tsel_Qnil;
-  }
-  else if(!tsel_string_p(env, args[1])) {
-    tsel_signal_wrong_type(env, "stringp", args[1]);
-    return tsel_Qnil;
-  }
-  TSLanguage *lang = tsel_language_get_ptr(env, args[0])->ptr;
-  if(tsel_pending_nonlocal_exit(env)) {
-    return tsel_Qnil;
-  }
+  TSElLanguage *lang;
   char *str;
+  TSEL_SUBR_EXTRACT(language, env, args[0], &lang);
   TSEL_SUBR_EXTRACT(string, env, args[1], &str);
-  TSSymbol symbol = ts_language_symbol_for_name(lang, str);
+  TSSymbol symbol = ts_language_symbol_for_name(lang->ptr, str);
   emacs_value res;
   free(str);
   str = NULL;
-  if(symbol == 0 || !tsel_symbol_create(env, symbol, &res)) {
+  if(symbol == 0 || !tsel_symbol_create(env, symbol, &res) || tsel_pending_nonlocal_exit(env)) {
     return tsel_Qnil;
   }
   return res;
@@ -116,21 +91,11 @@ static emacs_value tsel_language_symbol_type(emacs_env *env,
                                              __attribute__((unused)) ptrdiff_t nargs,
                                              emacs_value *args,
                                              __attribute__((unused)) void *data) {
-  if(!tsel_language_p(env, args[0])) {
-    tsel_signal_wrong_type(env, "tree-sitter-language-p", args[0]);
-    return tsel_Qnil;
-  }
-  else if(!tsel_symbol_p(env, args[1])) {
-    tsel_signal_wrong_type(env, "tree-sitter-symbol-p", args[1]);
-    return tsel_Qnil;
-  }
-  TSLanguage *lang = tsel_language_get_ptr(env, args[0])->ptr;
+  TSElLanguage *lang;
   TSSymbol symbol;
-  if(!lang || !tsel_symbol_get_code(env, args[1], &symbol) ||
-     tsel_pending_nonlocal_exit(env)) {
-    return tsel_Qnil;
-  }
-  TSSymbolType type = ts_language_symbol_type(lang, symbol);
+  TSEL_SUBR_EXTRACT(language, env, args[0], &lang);
+  TSEL_SUBR_EXTRACT(tssymbol, env, args[1], &symbol);
+  TSSymbolType type = ts_language_symbol_type(lang->ptr, symbol);
   if(type == TSSymbolTypeRegular) {
     return env->intern(env, "regular");
   }
@@ -150,15 +115,9 @@ static emacs_value tsel_language_version(emacs_env *env,
                                              __attribute__((unused)) ptrdiff_t nargs,
                                              emacs_value *args,
                                              __attribute__((unused)) void *data) {
-  if(!tsel_language_p(env, args[0])) {
-    tsel_signal_wrong_type(env, "tree-sitter-language-p", args[0]);
-    return tsel_Qnil;
-  }
-  TSLanguage *lang = tsel_language_get_ptr(env, args[0])->ptr;
-  if(!lang) {
-    return tsel_Qnil;
-  }
-  return env->make_integer(env, ts_language_version(lang));
+  TSElLanguage *lang;
+  TSEL_SUBR_EXTRACT(language, env, args[0], &lang);
+  return env->make_integer(env, ts_language_version(lang->ptr));
 }
 
 static const char *tsel_language_p_wrapped_doc = "Return t if OBJECT is a tree-sitter-language.\n"
