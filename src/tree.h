@@ -27,6 +27,7 @@
 typedef struct TSElTree {
   uintptr_t refcount;
   TSTree *tree;
+  bool dirty;
 } TSElTree;
 
 bool tsel_tree_init(emacs_env *env);

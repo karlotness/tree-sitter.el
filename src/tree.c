@@ -141,6 +141,7 @@ static emacs_value tsel_tree_edit(emacs_env *env,
   }
   // Signal the edit
   ts_tree_edit(tree->tree, &edit);
+  tree->dirty = true;
   return tsel_Qt;
 }
 
@@ -167,6 +168,7 @@ TSElTree *tsel_tree_wrap(TSTree *tree) {
   }
   wrapper->refcount = 1;
   wrapper->tree = tree;
+  wrapper->dirty = false;
   return wrapper;
 }
 

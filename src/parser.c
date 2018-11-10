@@ -144,7 +144,7 @@ static emacs_value tsel_parser_parse_buffer(emacs_env *env,
     tsel_signal_wrong_type(env, "bufferp", args[1]);
     return tsel_Qnil;
   }
-  TSTree *tree = NULL;
+  TSElTree *tree = NULL;
   // If we have a third arg, make sure it is a tree
   if(nargs >= 3 && !env->eq(env, tsel_Qnil, args[2])) {
     if(!tsel_tree_p(env, args[2]) || tsel_pending_nonlocal_exit(env)) {
@@ -154,7 +154,7 @@ static emacs_value tsel_parser_parse_buffer(emacs_env *env,
     else {
       TSElTree *init_tree = tsel_tree_get_ptr(env, args[2]);
       if(init_tree) {
-        tree = init_tree->tree;
+        tree = init_tree;
       }
     }
     if(tsel_pending_nonlocal_exit(env)) {
@@ -168,7 +168,15 @@ static emacs_value tsel_parser_parse_buffer(emacs_env *env,
                        .encoding = TSInputEncodingUTF8,
                        .read = &tsel_parser_read_buffer_function};
   TSParser *parse = tsel_parser_get_ptr(env, args[0])->parser;
-  TSTree *new_tree = ts_parser_parse(parse, tree, input_def);
+  TSTree *new_tree = NULL;
+  if(!tree || tree->dirty) {
+    // No tree given or tree is dirty
+    new_tree = ts_parser_parse(parse, tree ? tree->tree : NULL, input_def);
+  }
+  else {
+    // Tree is specified but not dirty, just make a copy
+    new_tree = ts_tree_copy(tree->tree);
+  }
   TSElTree *wrapped_tree = tsel_tree_wrap(new_tree);
   emacs_value emacs_tree = tsel_tree_emacs_move(env, wrapped_tree);
   if(!wrapped_tree || tsel_pending_nonlocal_exit(env)) {
