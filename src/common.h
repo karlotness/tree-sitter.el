@@ -23,6 +23,15 @@
 #include <emacs-module.h>
 #include <stdbool.h>
 
+#define TSEL_SUBR_EXTRACT(type, env, obj, res)                          \
+  if(!tsel_extract_##type(env, obj, res)) {                             \
+    if(tsel_pending_nonlocal_exit(env)) {                               \
+      return tsel_Qnil;                                                 \
+    }                                                                   \
+    tsel_signal_error(env, "Failed to extract " #type ".");             \
+    return tsel_Qnil;                                                   \
+  }
+
 typedef emacs_value (emacs_function) (emacs_env *env,
                                       ptrdiff_t nargs, emacs_value *args,
                                       void *data);
