@@ -38,9 +38,12 @@
   "Idle timer for tree-sitter-live.")
 (defvar tree-sitter-live--pending-buffers nil
   "List of buffers which need to be re-parsed at next idle interval.")
-(defvar tree-sitter-live-after-parse-hook nil
-  "Hook run after a buffer is re-parsed with tree-sitter.
-The affected buffer is current while this hook is running.")
+(defvar tree-sitter-live-after-parse-functions nil
+  "Functions to call after a buffer is re-parsed with tree-sitter.
+The affected buffer is current while this hook is running.
+Functions are called with one argument: the old tree from before
+the most recent re-parse. The current tree is stored in the
+variable `tree-sitter-live-tree'.")
 
 (defvar-local tree-sitter-live--parser nil
   "Tree-sitter parser used to parse this buffer.")
@@ -80,13 +83,13 @@ The affected buffer is current while this hook is running.")
   (dolist (buf tree-sitter-live--pending-buffers)
     (when (buffer-live-p buf)
       (with-current-buffer buf
-        (setq tree-sitter-live-tree
-              (tree-sitter-parser-parse-buffer tree-sitter-live--parser
-                                               (current-buffer)
-                                               tree-sitter-live-tree))
-        (run-hooks 'tree-sitter-live-after-parse-hook))))
+        (let ((old-tree tree-sitter-live-tree))
+          (setq tree-sitter-live-tree
+                (tree-sitter-parser-parse-buffer tree-sitter-live--parser
+                                                 (current-buffer)
+                                                 tree-sitter-live-tree))
+        (run-hook-with-args 'tree-sitter-live-after-parse-functions old-tree)))))
   (setq tree-sitter-live--pending-buffers nil))
-
 
 (defun tree-sitter-live-setup (language)
   "Enable tree-sitter-live for LANGUAGE in current buffer.
@@ -102,7 +105,8 @@ LANGUAGE must be a tree-sitter-language record."
   (when (null tree-sitter-live--idle-timer)
     (setq tree-sitter-live--idle-timer
           (run-with-idle-timer tree-sitter-live-idle-time
-                               t #'tree-sitter-live--idle-update))))
+                               t #'tree-sitter-live--idle-update)))
+  nil)
 
 (provide 'tree-sitter-live)
 ;;; tree-sitter-defs.el ends here
