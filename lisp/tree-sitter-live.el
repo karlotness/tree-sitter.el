@@ -44,6 +44,10 @@ The affected buffer is current while this hook is running.
 Functions are called with one argument: the old tree from before
 the most recent re-parse. The current tree is stored in the
 variable `tree-sitter-live-tree'.")
+(defvar tree-sitter-live-auto-alist nil
+  "Alist specifying tree-sitter languages by major mode symbols.
+Each entry is a pair of (MODE . LANG) where MODE is a major-mode
+symbol and LANG is a tree-sitter language")
 
 (defvar-local tree-sitter-live--parser nil
   "Tree-sitter parser used to parse this buffer.")
@@ -107,6 +111,12 @@ LANGUAGE must be a tree-sitter-language record."
           (run-with-idle-timer tree-sitter-live-idle-time
                                t #'tree-sitter-live--idle-update)))
   nil)
+
+(defun tree-sitter-live-auto ()
+  (let ((lang (assq major-mode tree-sitter-live-auto-alist)))
+    (if lang
+        (tree-sitter-live-setup (cdr lang))
+      (error "No automatic language for mode \"%s\"" major-mode))))
 
 (provide 'tree-sitter-live)
 ;;; tree-sitter-defs.el ends here
