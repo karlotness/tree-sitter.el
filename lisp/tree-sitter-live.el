@@ -95,11 +95,16 @@ symbol and LANG is a tree-sitter language")
         (run-hook-with-args 'tree-sitter-live-after-parse-functions old-tree)))))
   (setq tree-sitter-live--pending-buffers nil))
 
-(defun tree-sitter-live-setup (language)
+(defun tree-sitter-live-setup (&optional language)
   "Enable tree-sitter-live for LANGUAGE in current buffer.
-LANGUAGE must be a tree-sitter-language record."
+LANGUAGE must be a tree-sitter-language record. If LANGUAGE is
+unspecified consult `tree-sitter-live-auto-alist' for the
+language to use based on `major-mode'."
   (setq tree-sitter-live--parser (tree-sitter-parser-new))
-  (tree-sitter-parser-set-language tree-sitter-live--parser language)
+  (let ((language (or language (cdr (assq major-mode tree-sitter-live-auto-alist)))))
+    (unless language
+      (error "Language unspecified for tree-sitter-live"))
+    (tree-sitter-parser-set-language tree-sitter-live--parser language))
   (setq tree-sitter-live-tree
         (tree-sitter-parser-parse-buffer tree-sitter-live--parser
                                          (current-buffer)))
@@ -111,12 +116,6 @@ LANGUAGE must be a tree-sitter-language record."
           (run-with-idle-timer tree-sitter-live-idle-time
                                t #'tree-sitter-live--idle-update)))
   nil)
-
-(defun tree-sitter-live-auto ()
-  (let ((lang (assq major-mode tree-sitter-live-auto-alist)))
-    (if lang
-        (tree-sitter-live-setup (cdr lang))
-      (error "No automatic language for mode \"%s\"" major-mode))))
 
 (provide 'tree-sitter-live)
 ;;; tree-sitter-defs.el ends here
