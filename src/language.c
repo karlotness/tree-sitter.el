@@ -238,6 +238,25 @@ TSElLanguage *tsel_language_get_ptr(emacs_env *env, emacs_value obj) {
   return ptr;
 }
 
+bool tsel_extract_language(emacs_env *env, emacs_value obj, TSElLanguage **lang) {
+  if(!tsel_language_p(env, obj)) {
+    tsel_signal_wrong_type(env, "tree-sitter-language-p", obj);
+    return false;
+  }
+  // Get the ptr field
+  emacs_value user_ptr;
+  if(!tsel_record_get_field(env, obj, 1, &user_ptr)) {
+    return false;
+  }
+  // Get the raw pointer
+  TSElLanguage *ptr = env->get_user_ptr(env, user_ptr);
+  if(tsel_pending_nonlocal_exit(env)) {
+    return false;
+  }
+  *lang = ptr;
+  return true;
+}
+
 emacs_value tsel_language_wrap(emacs_env *env, TSElLanguage *lang) {
   emacs_value Qts_language_create = env->intern(env, "tree-sitter-language--create");
   emacs_value user_ptr = env->make_user_ptr(env, NULL, lang);

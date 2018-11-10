@@ -76,6 +76,25 @@ bool tsel_symbol_get_code(emacs_env *env, emacs_value obj, TSSymbol *code_out) {
   return true;
 }
 
+bool tsel_extract_tssymbol(emacs_env *env, emacs_value obj, TSSymbol *code_out) {
+  if(!tsel_symbol_p(env, obj)) {
+    tsel_signal_wrong_type(env, "tree-sitter-symbol-p", obj);
+    return false;
+  }
+  // Extract the "code" field and make sure it's an integer
+  emacs_value code;
+  if(!tsel_record_get_field(env, obj, 1, &code)) {
+    return false;
+  }
+  // Ensure the code is non-negative
+  intmax_t raw_code = env->extract_integer(env, code);
+  if(tsel_pending_nonlocal_exit(env)){
+    return false;
+  }
+  *code_out = raw_code;
+  return true;
+}
+
 bool tsel_symbol_create(emacs_env *env, TSSymbol code, emacs_value *obj_out) {
   emacs_value ecode = env->make_integer(env, code);
   emacs_value Qts_symb_create = env->intern(env, "tree-sitter-symbol--create");
