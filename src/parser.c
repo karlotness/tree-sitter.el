@@ -24,7 +24,7 @@
 #include "tree.h"
 
 #define TSEL_PARSE_CHAR_BUFFER_SIZE 500
-static char tsel_parser_char_buffer[TSEL_PARSE_CHAR_BUFFER_SIZE + 1];
+static char tsel_parser_char_buffer[TSEL_PARSE_CHAR_BUFFER_SIZE + 1] = {0};
 static emacs_value Qts_buffer_substring;
 static emacs_value emacs_buffer_read_length;
 
