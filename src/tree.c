@@ -27,7 +27,7 @@ static void tsel_tree_fin(void *ptr) {
   tsel_tree_release(tree);
 }
 
-static char *tsel_tree_p_wrapped_doc = "Return t if OBJECT is a tree-sitter-tree.\n"
+static const char *tsel_tree_p_wrapped_doc = "Return t if OBJECT is a tree-sitter-tree.\n"
   "\n"
   "(fn OBJECT)";
 static emacs_value tsel_tree_p_wrapped(emacs_env *env,
@@ -40,7 +40,7 @@ static emacs_value tsel_tree_p_wrapped(emacs_env *env,
   return tsel_Qnil;
 }
 
-static char *tsel_tree_root_node_doc = "Return the root node of TREE.\n"
+static const char *tsel_tree_root_node_doc = "Return the root node of TREE.\n"
   "\n"
   "(fn TREE)";
 static emacs_value tsel_tree_root_node(emacs_env *env,
@@ -70,7 +70,7 @@ static emacs_value tsel_tree_root_node(emacs_env *env,
   return res;
 }
 
-static char *tsel_tree_copy_doc = "Return a shallow copy of TREE.\n"
+static const char *tsel_tree_copy_doc = "Return a shallow copy of TREE.\n"
   "\n"
   "(fn TREE)";
 static emacs_value tsel_tree_copy(emacs_env *env,
@@ -97,7 +97,7 @@ static emacs_value tsel_tree_copy(emacs_env *env,
   return emacs_tree;
 }
 
-static char *tsel_tree_edit_doc = "Mark a portion of TREE as edited.\n"
+static const char *tsel_tree_edit_doc = "Mark a portion of TREE as edited.\n"
   "\n"
   "(fn TREE START-BYTE OLD-END-BYTE NEW-END-BYTE START-POINT OLD-END-POINT NEW-END-POINT)";
 static emacs_value tsel_tree_edit(emacs_env *env,

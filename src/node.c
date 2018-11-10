@@ -33,7 +33,7 @@ static bool tsel_named_nodes(emacs_env *env, emacs_value arg) {
   return env->eq(env, arg, env->intern(env, "named"));
 }
 
-static char *tsel_node_p_wrapped_doc = "Return t if OBJECT is a tree-sitter-node.\n"
+static const char *tsel_node_p_wrapped_doc = "Return t if OBJECT is a tree-sitter-node.\n"
   "\n"
   "(fn OBJECT)";
 static emacs_value tsel_node_p_wrapped(emacs_env *env,
@@ -46,7 +46,7 @@ static emacs_value tsel_node_p_wrapped(emacs_env *env,
   return tsel_Qnil;
 }
 
-static char *tsel_node_symbol_doc = "Return the symbol of node NODE\n"
+static const char *tsel_node_symbol_doc = "Return the symbol of node NODE\n"
   "\n"
   "(fn NODE)";
 static emacs_value tsel_node_symbol(emacs_env *env,
@@ -71,7 +71,7 @@ static emacs_value tsel_node_symbol(emacs_env *env,
   return obj;
 }
 
-static char *tsel_node_type_doc = "Return the type of node NODE.\n"
+static const char *tsel_node_type_doc = "Return the type of node NODE.\n"
   "The node's type is a string, the same as the name of its symbol\n"
   "under the tree's language. See `tree-sitter-language-symbol-name'.\n"
   "\n"
@@ -94,7 +94,7 @@ static emacs_value tsel_node_type(emacs_env *env,
   return str;
 }
 
-static char *tsel_node_start_byte_doc = "Return the starting byte of a tree-sitter node.\n"
+static const char *tsel_node_start_byte_doc = "Return the starting byte of a tree-sitter node.\n"
   "\n"
   "(fn NODE)";
 static emacs_value tsel_node_start_byte(emacs_env *env,
@@ -114,7 +114,7 @@ static emacs_value tsel_node_start_byte(emacs_env *env,
   return env->make_integer(env, byte + 1);
 }
 
-static char *tsel_node_end_byte_doc = "Return the ending byte of a tree-sitter node.\n"
+static const char *tsel_node_end_byte_doc = "Return the ending byte of a tree-sitter node.\n"
   "\n"
   "(fn NODE)";
 static emacs_value tsel_node_end_byte(emacs_env *env,
@@ -134,7 +134,7 @@ static emacs_value tsel_node_end_byte(emacs_env *env,
   return env->make_integer(env, byte + 1);
 }
 
-static char *tsel_node_start_point_doc = "Return the starting point of NODE.\n"
+static const char *tsel_node_start_point_doc = "Return the starting point of NODE.\n"
   "The point is a pair of row and column collected into a\n"
   "tree-sitter-point record.\n"
   "\n"
@@ -156,7 +156,7 @@ static emacs_value tsel_node_start_point(emacs_env *env,
   return tsel_point_emacs_move(env, &point);
 }
 
-static char *tsel_node_end_point_doc = "Return the ending point of NODE.\n"
+static const char *tsel_node_end_point_doc = "Return the ending point of NODE.\n"
   "The point is a pair of row and column collected into a\n"
   "tree-sitter-point record.\n"
   "\n"
@@ -178,7 +178,7 @@ static emacs_value tsel_node_end_point(emacs_env *env,
   return tsel_point_emacs_move(env, &point);
 }
 
-static char *tsel_node_eq_doc = "Return non-nil if tree-sitter-node A is equal to B.\n"
+static const char *tsel_node_eq_doc = "Return non-nil if tree-sitter-node A is equal to B.\n"
   "Both arguments must be tree-sitter-node records.\n"
   "\n"
   "(fn A B)";
@@ -204,7 +204,7 @@ static emacs_value tsel_node_eq(emacs_env *env,
   return tsel_Qnil;
 }
 
-static char *tsel_node_is_named_doc = "Return non-nil if NODE is named.\n"
+static const char *tsel_node_is_named_doc = "Return non-nil if NODE is named.\n"
   "\n"
   "(fn NODE)";
 static emacs_value tsel_node_is_named(emacs_env *env,
@@ -226,7 +226,7 @@ static emacs_value tsel_node_is_named(emacs_env *env,
   return tsel_Qnil;
 }
 
-static char *tsel_node_is_missing_doc = "Return non-nil if NODE is missing.\n"
+static const char *tsel_node_is_missing_doc = "Return non-nil if NODE is missing.\n"
   "\n"
   "(fn NODE)";
 static emacs_value tsel_node_is_missing(emacs_env *env,
@@ -248,7 +248,7 @@ static emacs_value tsel_node_is_missing(emacs_env *env,
   return tsel_Qnil;
 }
 
-static char *tsel_node_has_changes_doc = "Return non-nil if NODE has changes.\n"
+static const char *tsel_node_has_changes_doc = "Return non-nil if NODE has changes.\n"
   "\n"
   "(fn NODE)";
 static emacs_value tsel_node_has_changes(emacs_env *env,
@@ -270,7 +270,7 @@ static emacs_value tsel_node_has_changes(emacs_env *env,
   return tsel_Qnil;
 }
 
-static char *tsel_node_parent_doc = "Return the parent of NODE.\n"
+static const char *tsel_node_parent_doc = "Return the parent of NODE.\n"
   "\n"
   "(fn NODE)";
 static emacs_value tsel_node_parent(emacs_env *env,
@@ -295,7 +295,7 @@ static emacs_value tsel_node_parent(emacs_env *env,
   return tsel_node_emacs_move(env, wrapped);
 }
 
-static char *tsel_node_child_count_doc = "Return the number of children of NODE.\n"
+static const char *tsel_node_child_count_doc = "Return the number of children of NODE.\n"
   "If TYPE is nil, t, or unspecified count all children. Otherwise if\n"
   "TYPE is the symbol 'named count only named children.\n"
   "The behavior of other values for TYPE is unspecified and may change.\n"
@@ -321,7 +321,7 @@ static emacs_value tsel_node_child_count(emacs_env *env,
   return env->make_integer(env, ts_node_child_count(node->node));
 }
 
-static char *tsel_node_child_doc = "Return child of NODE with index IDX.\n"
+static const char *tsel_node_child_doc = "Return child of NODE with index IDX.\n"
   "If TYPE is nil, t, or unspecified include all children. Otherwise, if\n"
   "TYPE is the symbol 'named include only named children.\n"
   "The behavior of other values for TYPE is unspecified and may change.\n"
@@ -364,7 +364,7 @@ static emacs_value tsel_node_child(emacs_env *env,
   return tsel_node_emacs_move(env, wrapped);
 }
 
-static char *tsel_node_next_sibling_doc = "Return next sibling of NODE.\n"
+static const char *tsel_node_next_sibling_doc = "Return next sibling of NODE.\n"
   "If TYPE is nil, t, or unspecified include all siblings. Otherwise, if\n"
   "TYPE is the symbol 'named include only named siblings.\n"
   "The behavior of other values for TYPE is unspecified and may change.\n"
@@ -399,7 +399,7 @@ static emacs_value tsel_node_next_sibling(emacs_env *env,
   return tsel_node_emacs_move(env, wrapped);
 }
 
-static char *tsel_node_prev_sibling_doc = "Return previous sibling of NODE.\n"
+static const char *tsel_node_prev_sibling_doc = "Return previous sibling of NODE.\n"
   "If TYPE is nil, t, or unspecified include all siblings. Otherwise, if\n"
   "TYPE is the symbol 'named include only named siblings.\n"
   "The behavior of other values for TYPE is unspecified and may change.\n"
@@ -434,7 +434,7 @@ static emacs_value tsel_node_prev_sibling(emacs_env *env,
   return tsel_node_emacs_move(env, wrapped);
 }
 
-static char *tsel_node_has_error_doc = "Return non-nil if NODE has an error.\n"
+static const char *tsel_node_has_error_doc = "Return non-nil if NODE has an error.\n"
   "\n"
   "(fn NODE)";
 static emacs_value tsel_node_has_error(emacs_env *env,
@@ -456,7 +456,7 @@ static emacs_value tsel_node_has_error(emacs_env *env,
   return tsel_Qnil;
 }
 
-static char *tsel_node_first_child_for_byte_doc = "Return first child of NODE for BYTE.\n"
+static const char *tsel_node_first_child_for_byte_doc = "Return first child of NODE for BYTE.\n"
   "If TYPE is nil, t, or unspecified include all siblings. Otherwise, if\n"
   "TYPE is the symbol 'named include only named siblings.\n"
   "The behavior of other values for TYPE is unspecified and may change.\n"
@@ -499,7 +499,7 @@ static emacs_value tsel_node_first_child_for_byte(emacs_env *env,
   return tsel_node_emacs_move(env, wrapped);
 }
 
-static char *tsel_node_descendant_for_byte_range_doc = "Return descendant of NODE for byte range START to END.\n"
+static const char *tsel_node_descendant_for_byte_range_doc = "Return descendant of NODE for byte range START to END.\n"
   "If TYPE is nil, t, or unspecified include all siblings. Otherwise, if\n"
   "TYPE is the symbol 'named include only named siblings.\n"
   "The behavior of other values for TYPE is unspecified and may change.\n"
@@ -545,7 +545,7 @@ static emacs_value tsel_node_descendant_for_byte_range(emacs_env *env,
   return tsel_node_emacs_move(env, wrapped);
 }
 
-static char *tsel_node_edit_doc = "Mark NODE as edited.\n"
+static const char *tsel_node_edit_doc = "Mark NODE as edited.\n"
   "\n"
   "(fn NODE START-BYTE OLD-END-BYTE NEW-END-BYTE START-POINT OLD-END-POINT NEW-END-POINT)";
 static emacs_value tsel_node_edit(emacs_env *env,

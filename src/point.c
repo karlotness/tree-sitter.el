@@ -20,7 +20,7 @@
 #include "point.h"
 #include "common.h"
 
-static char *tsel_point_p_wrapped_doc = "Return t if OBJECT is a tree-sitter-point.\n"
+static const char *tsel_point_p_wrapped_doc = "Return t if OBJECT is a tree-sitter-point.\n"
   "\n"
   "(fn OBJECT)";
 static emacs_value tsel_point_p_wrapped(emacs_env *env,

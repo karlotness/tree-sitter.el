@@ -20,7 +20,7 @@
 #include "symbol.h"
 #include "common.h"
 
-static char *tsel_symbol_p_wrapped_doc = "Return t if OBJECT is a tree-sitter-symbol.\n"
+static const char *tsel_symbol_p_wrapped_doc = "Return t if OBJECT is a tree-sitter-symbol.\n"
   "\n"
   "(fn OBJECT)";
 static emacs_value tsel_symbol_p_wrapped(emacs_env *env,
