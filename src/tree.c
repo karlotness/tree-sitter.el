@@ -173,6 +173,10 @@ TSElTree *tsel_tree_wrap(TSTree *tree) {
 }
 
 emacs_value tsel_tree_emacs_move(emacs_env *env, TSElTree *tree) {
+  if(!tree->tree) {
+    tsel_tree_release(tree);
+    return tsel_Qnil;
+  }
   emacs_value Qts_language_create = env->intern(env, "tree-sitter-tree--create");
   emacs_value user_ptr = env->make_user_ptr(env, &tsel_tree_fin, tree);
   emacs_value func_args[1] = { user_ptr };
@@ -195,7 +199,9 @@ void tsel_tree_release(TSElTree *tree) {
   }
   if(tree->refcount == 0) {
     // Time to drop the tree
-    ts_tree_delete(tree->tree);
+    if(tree->tree) {
+      ts_tree_delete(tree->tree);
+    }
     free(tree);
   }
 }
