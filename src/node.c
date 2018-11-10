@@ -545,6 +545,53 @@ static emacs_value tsel_node_descendant_for_byte_range(emacs_env *env,
   return tsel_node_emacs_move(env, wrapped);
 }
 
+static char *tsel_node_edit_doc = "Mark NODE as edited.\n"
+  "\n"
+  "(fn NODE START-BYTE OLD-END-BYTE NEW-END-BYTE START-POINT OLD-END-POINT NEW-END-POINT)";
+static emacs_value tsel_node_edit(emacs_env *env,
+                                  __attribute__((unused)) ptrdiff_t nargs,
+                                  emacs_value *args,
+                                  __attribute__((unused)) void *data) {
+  // Check argument types
+  if(!tsel_node_p(env, args[0])) {
+    tsel_signal_wrong_type(env, "tree-sitter-node-p", args[0]);
+    return tsel_Qnil;
+  }
+  for(int i = 1; i < 4; i++) {
+    if(!tsel_integer_p(env, args[i])) {
+      tsel_signal_wrong_type(env, "integerp", args[i]);
+      return tsel_Qnil;
+    }
+  }
+  for(int i = 4; i < 7; i++) {
+    if(!tsel_point_p(env, args[i])) {
+      tsel_signal_wrong_type(env, "tree-sitter-point-p", args[i]);
+      return tsel_Qnil;
+    }
+  }
+  // Extract arguments
+  TSElNode *node = tsel_node_get_ptr(env, args[0]);
+  if(!node) {
+    tsel_signal_error(env, "Failed to get node.");
+    return tsel_Qnil;
+  }
+  TSInputEdit edit;
+  edit.start_byte = env->extract_integer(env, args[1]) - 1;
+  edit.old_end_byte = env->extract_integer(env, args[2]) - 1;
+  edit.new_end_byte = env->extract_integer(env, args[3]) - 1;
+  if(!tsel_point_get_values(env, args[4], &edit.start_point.row, &edit.start_point.column) ||
+     !tsel_point_get_values(env, args[5], &edit.old_end_point.row, &edit.old_end_point.column) ||
+     !tsel_point_get_values(env, args[6], &edit.new_end_point.row, &edit.new_end_point.column)) {
+    tsel_signal_error(env, "Failed to extract points.");
+  }
+  if(tsel_pending_nonlocal_exit(env)) {
+    return tsel_Qnil;
+  }
+  // Signal the edit
+  ts_node_edit(&node->node, &edit);
+  return tsel_Qt;
+}
+
 bool tsel_node_init(emacs_env *env) {
   bool function_result = tsel_define_function(env, "tree-sitter-node-p",
                                               &tsel_node_p_wrapped, 1, 1,
@@ -603,6 +650,9 @@ bool tsel_node_init(emacs_env *env) {
   function_result &= tsel_define_function(env, "tree-sitter-node-descendant-for-byte-range",
                                           &tsel_node_descendant_for_byte_range, 3, 4,
                                           tsel_node_descendant_for_byte_range_doc, NULL);
+  function_result &= tsel_define_function(env, "tree-sitter-node-edit",
+                                          &tsel_node_edit, 7, 7,
+                                          tsel_node_edit_doc, NULL);
   return function_result;
 }
 
