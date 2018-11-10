@@ -90,6 +90,10 @@ static emacs_value tsel_parser_language(emacs_env *env,
     return tsel_Qnil;
   }
   TSElParser *parse = tsel_parser_get_ptr(env, args[0]);
+  if(!parse) {
+    tsel_signal_error(env, "Failed to retrieve parser.");
+    return tsel_Qnil;
+  }
   TSElLanguage *lang = parse->lang;
   if(!lang) {
     return tsel_Qnil;
@@ -167,7 +171,12 @@ static emacs_value tsel_parser_parse_buffer(emacs_env *env,
   TSInput input_def = {.payload = &payload,
                        .encoding = TSInputEncodingUTF8,
                        .read = &tsel_parser_read_buffer_function};
-  TSParser *parse = tsel_parser_get_ptr(env, args[0])->parser;
+  TSElParser *wrapped_parser = tsel_parser_get_ptr(env, args[0]);
+  if(!wrapped_parser) {
+    tsel_signal_error(env, "Failed to retrieve parser.");
+    return tsel_Qnil;
+  }
+  TSParser *parse = wrapped_parser->parser;
   TSTree *new_tree = NULL;
   if(!tree || tree->dirty) {
     // No tree given or tree is dirty
@@ -206,6 +215,10 @@ static emacs_value tsel_parser_set_language(emacs_env *env,
     return tsel_Qnil;
   }
   TSElParser *parse = tsel_parser_get_ptr(env, args[0]);
+  if(!parse) {
+    tsel_signal_error(env, "Failed to retrieve parser.");
+    return tsel_Qnil;
+  }
   TSElLanguage *lang = NULL;
   TSLanguage *raw_lang = NULL;
   if(!lang_is_nil) {
