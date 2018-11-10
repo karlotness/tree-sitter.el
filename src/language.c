@@ -93,10 +93,8 @@ static emacs_value tsel_language_symbol_for_name(emacs_env *env,
   if(tsel_pending_nonlocal_exit(env)) {
     return tsel_Qnil;
   }
-  char *str = tsel_extract_string(env, args[1]);
-  if(!str) {
-    return tsel_Qnil;
-  }
+  char *str;
+  TSEL_SUBR_EXTRACT(string, env, args[1], &str);
   TSSymbol symbol = ts_language_symbol_for_name(lang, str);
   emacs_value res;
   free(str);

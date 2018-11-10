@@ -313,7 +313,8 @@ static emacs_value tsel_node_child(emacs_env *env,
     tsel_signal_wrong_type(env, "integerp", args[1]);
     return tsel_Qnil;
   }
-  uint32_t num = env->extract_integer(env, args[1]);
+  intmax_t num;
+  TSEL_SUBR_EXTRACT(integer, env, args[1], &num);
   if(tsel_pending_nonlocal_exit(env)) {
     return tsel_Qnil;
   }
@@ -426,7 +427,9 @@ static emacs_value tsel_node_first_child_for_byte(emacs_env *env,
     tsel_signal_wrong_type(env, "integerp", args[1]);
     return tsel_Qnil;
   }
-  uint32_t byte = env->extract_integer(env, args[1]) - 1;
+  intmax_t byte;
+  TSEL_SUBR_EXTRACT(integer, env, args[1], &byte);
+  byte--;
   if(tsel_pending_nonlocal_exit(env)) {
     return tsel_Qnil;
   }
@@ -471,8 +474,11 @@ static emacs_value tsel_node_descendant_for_byte_range(emacs_env *env,
       return tsel_Qnil;
     }
   }
-  uint32_t byte_start = env->extract_integer(env, args[1]) - 1;
-  uint32_t byte_end = env->extract_integer(env, args[2]) - 1;
+  intmax_t byte_start, byte_end;
+  TSEL_SUBR_EXTRACT(integer, env, args[1], &byte_start);
+  TSEL_SUBR_EXTRACT(integer, env, args[2], &byte_end);
+  byte_start--;
+  byte_end--;
   if(tsel_pending_nonlocal_exit(env)) {
     return tsel_Qnil;
   }
@@ -523,9 +529,13 @@ static emacs_value tsel_node_edit(emacs_env *env,
     return tsel_Qnil;
   }
   TSInputEdit edit;
-  edit.start_byte = env->extract_integer(env, args[1]) - 1;
-  edit.old_end_byte = env->extract_integer(env, args[2]) - 1;
-  edit.new_end_byte = env->extract_integer(env, args[3]) - 1;
+  intmax_t start_byte, old_end_byte, new_end_byte;
+  TSEL_SUBR_EXTRACT(integer, env, args[1], &start_byte);
+  TSEL_SUBR_EXTRACT(integer, env, args[2], &old_end_byte);
+  TSEL_SUBR_EXTRACT(integer, env, args[3], &new_end_byte);
+  edit.start_byte = start_byte - 1;
+  edit.old_end_byte = old_end_byte - 1;
+  edit.new_end_byte = new_end_byte - 1;
   if(!tsel_point_get_values(env, args[4], &edit.start_point.row, &edit.start_point.column) ||
      !tsel_point_get_values(env, args[5], &edit.old_end_point.row, &edit.old_end_point.column) ||
      !tsel_point_get_values(env, args[6], &edit.new_end_point.row, &edit.new_end_point.column)) {

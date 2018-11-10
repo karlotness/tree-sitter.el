@@ -128,9 +128,13 @@ static emacs_value tsel_tree_edit(emacs_env *env,
     return tsel_Qnil;
   }
   TSInputEdit edit;
-  edit.start_byte = env->extract_integer(env, args[1]) - 1;
-  edit.old_end_byte = env->extract_integer(env, args[2]) - 1;
-  edit.new_end_byte = env->extract_integer(env, args[3]) - 1;
+  intmax_t start_byte, old_end_byte, new_end_byte;
+  TSEL_SUBR_EXTRACT(integer, env, args[1], &start_byte);
+  TSEL_SUBR_EXTRACT(integer, env, args[2], &old_end_byte);
+  TSEL_SUBR_EXTRACT(integer, env, args[3], &new_end_byte);
+  edit.start_byte = start_byte - 1;
+  edit.old_end_byte = old_end_byte - 1;
+  edit.new_end_byte = new_end_byte - 1;
   if(!tsel_point_get_values(env, args[4], &edit.start_point.row, &edit.start_point.column) ||
      !tsel_point_get_values(env, args[5], &edit.old_end_point.row, &edit.old_end_point.column) ||
      !tsel_point_get_values(env, args[6], &edit.new_end_point.row, &edit.new_end_point.column)) {

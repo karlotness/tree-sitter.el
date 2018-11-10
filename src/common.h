@@ -46,9 +46,10 @@ bool tsel_define_function(emacs_env *env, char *function_name, emacs_function *f
 bool tsel_record_get_field(emacs_env *env, emacs_value obj, uint8_t field, emacs_value *out);
 bool tsel_check_record_type(emacs_env *env, char *record_type, emacs_value obj);
 bool tsel_string_p(emacs_env *env, emacs_value obj);
-char *tsel_extract_string(emacs_env *env, emacs_value obj);
+bool tsel_extract_string(emacs_env *env, emacs_value obj, char **res);
 void tsel_signal_error(emacs_env *env, char *message);
 bool tsel_integer_p(emacs_env *env, emacs_value obj);
+bool tsel_extract_integer(emacs_env *env, emacs_value obj, intmax_t *res);
 
 extern emacs_value tsel_Qnil;
 extern emacs_value tsel_Qt;

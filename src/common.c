@@ -106,23 +106,25 @@ bool tsel_string_p(emacs_env *env, emacs_value obj) {
   return true;
 }
 
-char *tsel_extract_string(emacs_env *env, emacs_value obj) {
+bool tsel_extract_string(emacs_env *env, emacs_value obj, char **res) {
   if(!tsel_string_p(env, obj)) {
-    return NULL;
+    tsel_signal_wrong_type(env, "stringp", obj);
+    return false;
   }
   ptrdiff_t size = 0;
   if(!env->copy_string_contents(env, obj, NULL, &size)) {
-    return NULL;
+    return false;
   }
   char *buf = malloc(sizeof(char) * size);
   if(!buf) {
-    return NULL;
+    return false;
   }
-  if(!env->copy_string_contents(env, obj, buf, &size)) {
+  if(!env->copy_string_contents(env, obj, buf, &size) || tsel_pending_nonlocal_exit(env)) {
     free(buf);
-    return NULL;
+    return false;
   }
-  return buf;
+  *res = buf;
+  return true;
 }
 
 void tsel_signal_error(emacs_env *env, char *message) {
@@ -139,6 +141,18 @@ bool tsel_integer_p(emacs_env *env, emacs_value obj) {
   emacs_value args[1] = { obj };
   if(!env->eq(env, env->funcall(env, Qstringp, 1, args), tsel_Qt) ||
      tsel_pending_nonlocal_exit(env)) {
+    return false;
+  }
+  return true;
+}
+
+bool tsel_extract_integer(emacs_env *env, emacs_value obj, intmax_t *res) {
+  if(!tsel_integer_p(env, obj)) {
+    tsel_signal_wrong_type(env, "integerp", obj);
+    return false;
+  }
+  *res = env->extract_integer(env, obj);
+  if(tsel_pending_nonlocal_exit(env)) {
     return false;
   }
   return true;
