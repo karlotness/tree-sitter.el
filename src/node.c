@@ -204,71 +204,40 @@ static emacs_value tsel_node_eq(emacs_env *env,
   return tsel_Qnil;
 }
 
+static bool (*tsel_node_predicates[4]) (TSNode) = {&ts_node_is_named, &ts_node_is_missing, &ts_node_has_changes, &ts_node_has_error};
+
+static emacs_value tsel_node_predicate(emacs_env *env,
+                                       __attribute__((unused)) ptrdiff_t nargs,
+                                       emacs_value *args,
+                                       void *data) {
+  bool (**tsel_node_function) (TSNode) = data;
+  if(!tsel_node_p(env, args[0])) {
+    tsel_signal_wrong_type(env, "tree-sitter-node-p", args[0]);
+    return tsel_Qnil;
+  }
+  TSElNode *node = tsel_node_get_ptr(env, args[0]);
+  if(!node || tsel_pending_nonlocal_exit(env)) {
+    tsel_signal_error(env, "Failed to retrieve node.");
+    return tsel_Qnil;
+  }
+  if((*tsel_node_function)(node->node)) {
+    return tsel_Qt;
+  }
+  return tsel_Qnil;
+}
+
 static const char *tsel_node_is_named_doc = "Return non-nil if NODE is named.\n"
   "\n"
   "(fn NODE)";
-static emacs_value tsel_node_is_named(emacs_env *env,
-                                      __attribute__((unused)) ptrdiff_t nargs,
-                                      emacs_value *args,
-                                      __attribute__((unused)) void *data) {
-  if(!tsel_node_p(env, args[0])) {
-    tsel_signal_wrong_type(env, "tree-sitter-node-p", args[0]);
-    return tsel_Qnil;
-  }
-  TSElNode *node = tsel_node_get_ptr(env, args[0]);
-  if(!node || tsel_pending_nonlocal_exit(env)) {
-    tsel_signal_error(env, "Failed to retrieve node.");
-    return tsel_Qnil;
-  }
-  if(ts_node_is_named(node->node)) {
-    return tsel_Qt;
-  }
-  return tsel_Qnil;
-}
-
 static const char *tsel_node_is_missing_doc = "Return non-nil if NODE is missing.\n"
   "\n"
   "(fn NODE)";
-static emacs_value tsel_node_is_missing(emacs_env *env,
-                                        __attribute__((unused)) ptrdiff_t nargs,
-                                        emacs_value *args,
-                                        __attribute__((unused)) void *data) {
-  if(!tsel_node_p(env, args[0])) {
-    tsel_signal_wrong_type(env, "tree-sitter-node-p", args[0]);
-    return tsel_Qnil;
-  }
-  TSElNode *node = tsel_node_get_ptr(env, args[0]);
-  if(!node || tsel_pending_nonlocal_exit(env)) {
-    tsel_signal_error(env, "Failed to retrieve node.");
-    return tsel_Qnil;
-  }
-  if(ts_node_is_missing(node->node)) {
-    return tsel_Qt;
-  }
-  return tsel_Qnil;
-}
-
 static const char *tsel_node_has_changes_doc = "Return non-nil if NODE has changes.\n"
   "\n"
   "(fn NODE)";
-static emacs_value tsel_node_has_changes(emacs_env *env,
-                                         __attribute__((unused)) ptrdiff_t nargs,
-                                         emacs_value *args,
-                                         __attribute__((unused)) void *data) {
-  if(!tsel_node_p(env, args[0])) {
-    tsel_signal_wrong_type(env, "tree-sitter-node-p", args[0]);
-    return tsel_Qnil;
-  }
-  TSElNode *node = tsel_node_get_ptr(env, args[0]);
-  if(!node || tsel_pending_nonlocal_exit(env)) {
-    tsel_signal_error(env, "Failed to retrieve node.");
-    return tsel_Qnil;
-  }
-  if(ts_node_has_changes(node->node)) {
-    return tsel_Qt;
-  }
-  return tsel_Qnil;
-}
+static const char *tsel_node_has_error_doc = "Return non-nil if NODE has an error.\n"
+  "\n"
+  "(fn NODE)";
 
 static const char *tsel_node_parent_doc = "Return the parent of NODE.\n"
   "\n"
@@ -434,28 +403,6 @@ static emacs_value tsel_node_prev_sibling(emacs_env *env,
   return tsel_node_emacs_move(env, wrapped);
 }
 
-static const char *tsel_node_has_error_doc = "Return non-nil if NODE has an error.\n"
-  "\n"
-  "(fn NODE)";
-static emacs_value tsel_node_has_error(emacs_env *env,
-                                       __attribute__((unused)) ptrdiff_t nargs,
-                                       emacs_value *args,
-                                       __attribute__((unused)) void *data) {
-  if(!tsel_node_p(env, args[0])) {
-    tsel_signal_wrong_type(env, "tree-sitter-node-p", args[0]);
-    return tsel_Qnil;
-  }
-  TSElNode *node = tsel_node_get_ptr(env, args[0]);
-  if(!node || tsel_pending_nonlocal_exit(env)) {
-    tsel_signal_error(env, "Failed to retrieve node.");
-    return tsel_Qnil;
-  }
-  if(ts_node_has_error(node->node)) {
-    return tsel_Qt;
-  }
-  return tsel_Qnil;
-}
-
 static const char *tsel_node_first_child_for_byte_doc = "Return first child of NODE for BYTE.\n"
   "If TYPE is nil, t, or unspecified include all siblings. Otherwise, if\n"
   "TYPE is the symbol 'named include only named siblings.\n"
@@ -619,17 +566,17 @@ bool tsel_node_init(emacs_env *env) {
                                           &tsel_node_eq, 2, 2,
                                           tsel_node_eq_doc, NULL);
   function_result &= tsel_define_function(env, "tree-sitter-node-named-p",
-                                          &tsel_node_is_named, 1, 1,
-                                          tsel_node_is_named_doc, NULL);
+                                          &tsel_node_predicate, 1, 1,
+                                          tsel_node_is_named_doc, &tsel_node_predicates[0]);
   function_result &= tsel_define_function(env, "tree-sitter-node-missing-p",
-                                          &tsel_node_is_missing, 1, 1,
-                                          tsel_node_is_missing_doc, NULL);
+                                          &tsel_node_predicate, 1, 1,
+                                          tsel_node_is_missing_doc, &tsel_node_predicates[1]);
   function_result &= tsel_define_function(env, "tree-sitter-node-has-changes-p",
-                                          &tsel_node_has_changes, 1, 1,
-                                          tsel_node_has_changes_doc, NULL);
+                                          &tsel_node_predicate, 1, 1,
+                                          tsel_node_has_changes_doc, &tsel_node_predicates[2]);
   function_result &= tsel_define_function(env, "tree-sitter-node-has-error-p",
-                                          &tsel_node_has_error, 1, 1,
-                                          tsel_node_has_error_doc, NULL);
+                                          &tsel_node_predicate, 1, 1,
+                                          tsel_node_has_error_doc, &tsel_node_predicates[3]);
   function_result &= tsel_define_function(env, "tree-sitter-node-parent",
                                           &tsel_node_parent, 1, 1,
                                           tsel_node_parent_doc, NULL);
