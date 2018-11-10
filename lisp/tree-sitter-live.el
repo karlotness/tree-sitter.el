@@ -21,11 +21,26 @@
 ;;; Commentary:
 
 ;; Live incremental parsing for buffers. Enable in a buffer using
-;; `tree-sitter-live-setup'.
+;; `tree-sitter-live-setup'. Buffers are parsed using tree-sitter
+;; after Emacs is idle for the number of seconds specified by
+;; `tree-sitter-live-idle-time'. After the buffer is re-parsed, the
+;; hook `tree-sitter-live-after-parse-hook' is run with the affected
+;; buffer as current. The updated tree is stored in
+;; `tree-sitter-live-tree'.
 
 ;;; Code:
 (require 'tree-sitter-defs)
 (require 'tree-sitter-module)
+
+(defvar tree-sitter-live-idle-time 0.25
+  "Idle time before re-parsing buffers with tree-sitter.")
+(defvar tree-sitter-live--idle-timer nil
+  "Idle timer for tree-sitter-live.")
+(defvar tree-sitter-live--pending-buffers nil
+  "List of buffers which need to be re-parsed at next idle interval.")
+(defvar tree-sitter-live-after-parse-hook nil
+  "Hook run after a buffer is re-parsed with tree-sitter.
+The affected buffer is current while this hook is running.")
 
 (defvar-local tree-sitter-live--parser nil
   "Tree-sitter parser used to parse this buffer.")
@@ -58,10 +73,20 @@
     (tree-sitter-tree-edit tree-sitter-live-tree
                            start-byte old-end-byte new-end-byte
                            start-point old-end-point new-end-point)
-    (setq tree-sitter-live-tree
-          (tree-sitter-parser-parse-buffer tree-sitter-live--parser
-                                           (current-buffer)
-                                           tree-sitter-live-tree))))
+    (when (not (memq (current-buffer) tree-sitter-live--pending-buffers))
+      (push (current-buffer) tree-sitter-live--pending-buffers))))
+
+(defun tree-sitter-live--idle-update ()
+  (dolist (buf tree-sitter-live--pending-buffers)
+    (when (buffer-live-p buf)
+      (with-current-buffer buf
+        (setq tree-sitter-live-tree
+              (tree-sitter-parser-parse-buffer tree-sitter-live--parser
+                                               (current-buffer)
+                                               tree-sitter-live-tree))
+        (run-hooks 'tree-sitter-live-after-parse-hook))))
+  (setq tree-sitter-live--pending-buffers nil))
+
 
 (defun tree-sitter-live-setup (language)
   "Enable tree-sitter-live for LANGUAGE in current buffer.
@@ -73,7 +98,11 @@ LANGUAGE must be a tree-sitter-language record."
                                          (current-buffer)))
   (setq tree-sitter-live--before-change (make-vector 4 0))
   (add-hook 'before-change-functions #'tree-sitter-live--before-change nil t)
-  (add-hook 'after-change-functions #'tree-sitter-live--after-change nil t))
+  (add-hook 'after-change-functions #'tree-sitter-live--after-change nil t)
+  (when (null tree-sitter-live--idle-timer)
+    (setq tree-sitter-live--idle-timer
+          (run-with-idle-timer tree-sitter-live-idle-time
+                               t #'tree-sitter-live--idle-update))))
 
 (provide 'tree-sitter-live)
 ;;; tree-sitter-defs.el ends here
