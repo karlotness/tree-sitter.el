@@ -57,35 +57,6 @@ bool tsel_point_p(emacs_env *env, emacs_value obj) {
   return true;
 }
 
-bool tsel_point_get_values(emacs_env *env, emacs_value point, uint32_t *row, uint32_t *col) {
-  if(!tsel_point_p(env, point)) {
-    return false;
-  }
-  emacs_value val;
-  uint32_t num;
-  uint32_t *locs[2] = {row, col};
-  for(int i = 0; i < 2; i++) {
-    // Skip any values which aren't requested
-    if(!locs[i]) {
-      continue;
-    }
-    // Get the field
-    if(!tsel_record_get_field(env, point, i + 1, &val)) {
-      return false;
-    }
-    num = env->extract_integer(env, val);
-    if(tsel_pending_nonlocal_exit(env)) {
-      return false;
-    }
-    if(i == 0) {
-      // Correct for fact that Emacs rows are indexed from 1
-      num--;
-    }
-    *locs[i] = num;
-  }
-  return true;
-}
-
 bool tsel_extract_point(emacs_env *env, emacs_value obj, TSPoint *point) {
   if(!tsel_point_p(env, obj)) {
     tsel_signal_wrong_type(env, "tree-sitter-point-p", obj);
