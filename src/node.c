@@ -464,7 +464,7 @@ emacs_value tsel_node_emacs_move(emacs_env *env, TSNode node, TSElTree *tree) {
   new->tree = tree;
   new->node = node;
   emacs_value Qts_node_create = env->intern(env, "tree-sitter-node--create");
-  emacs_value user_ptr = env->make_user_ptr(env, &tsel_node_fin, tree);
+  emacs_value user_ptr = env->make_user_ptr(env, &tsel_node_fin, new);
   emacs_value func_args[1] = { user_ptr };
   return env->funcall(env, Qts_node_create, 1, func_args);
 }
