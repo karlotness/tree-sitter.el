@@ -151,7 +151,7 @@ void tsel_tree_release(TSElTree *tree) {
 }
 
 bool tsel_tree_p(emacs_env *env, emacs_value obj) {
-  if(!tsel_check_record_type(env, "tree-sitter-tree", obj)) {
+  if(!tsel_check_record_type(env, "tree-sitter-tree", obj, 1)) {
     return false;
   }
   // Get the ptr field

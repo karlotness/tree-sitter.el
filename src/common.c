@@ -75,12 +75,19 @@ bool tsel_record_get_field(emacs_env *env, emacs_value obj, uint8_t field, emacs
   return true;
 }
 
-bool tsel_check_record_type(emacs_env *env, char *record_type, emacs_value obj) {
+bool tsel_check_record_type(emacs_env *env, char *record_type, emacs_value obj, int num_fields) {
   // Ensure the pointer is wrapped in the proper Emacs record type
   emacs_value Qrecordp = env->intern(env, "recordp");
   emacs_value args[2] = { obj, NULL};
   if(!env->eq(env, env->funcall(env, Qrecordp, 1, args), tsel_Qt) ||
      tsel_pending_nonlocal_exit(env)) {
+    return false;
+  }
+  // Check the length of the record
+  emacs_value Qlen = env->intern(env, "length");
+  emacs_value result = env->funcall(env, Qlen, 1, args);
+  intmax_t length = env->extract_integer(env, result);
+  if(tsel_pending_nonlocal_exit(env) || length != num_fields + 1) {
     return false;
   }
   // Check the record type tag

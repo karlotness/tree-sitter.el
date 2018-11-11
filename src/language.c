@@ -156,7 +156,7 @@ bool tsel_language_init(emacs_env *env) {
 }
 
 bool tsel_language_p(emacs_env *env, emacs_value obj) {
-  if(!tsel_check_record_type(env, "tree-sitter-language", obj)) {
+  if(!tsel_check_record_type(env, "tree-sitter-language", obj, 1)) {
     return false;
   }
   // Get the ptr field

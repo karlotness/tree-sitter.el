@@ -180,7 +180,7 @@ static emacs_value tsel_parser_set_language(emacs_env *env,
 }
 
 bool tsel_parser_p(emacs_env *env, emacs_value obj) {
-  if(!tsel_check_record_type(env, "tree-sitter-parser", obj)) {
+  if(!tsel_check_record_type(env, "tree-sitter-parser", obj, 1)) {
     return false;
   }
   // Get the ptr field

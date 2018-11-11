@@ -44,7 +44,7 @@ bool tsel_define_function(emacs_env *env, char *function_name, emacs_function *f
                           ptrdiff_t min_arg_count, ptrdiff_t max_arg_count, const char *doc,
                           void *data);
 bool tsel_record_get_field(emacs_env *env, emacs_value obj, uint8_t field, emacs_value *out);
-bool tsel_check_record_type(emacs_env *env, char *record_type, emacs_value obj);
+bool tsel_check_record_type(emacs_env *env, char *record_type, emacs_value obj, int num_fields);
 bool tsel_string_p(emacs_env *env, emacs_value obj);
 bool tsel_extract_string(emacs_env *env, emacs_value obj, char **res);
 void tsel_signal_error(emacs_env *env, char *message);

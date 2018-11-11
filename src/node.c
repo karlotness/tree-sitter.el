@@ -470,7 +470,7 @@ emacs_value tsel_node_emacs_move(emacs_env *env, TSNode node, TSElTree *tree) {
 }
 
 bool tsel_node_p(emacs_env *env, emacs_value obj) {
-  if(!tsel_check_record_type(env, "tree-sitter-node", obj)) {
+  if(!tsel_check_record_type(env, "tree-sitter-node", obj, 1)) {
     return false;
   }
   // Get the ptr field

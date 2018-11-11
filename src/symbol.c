@@ -41,7 +41,7 @@ bool tsel_symbol_init(__attribute__((unused)) emacs_env *env) {
 }
 
 bool tsel_symbol_p(emacs_env *env, emacs_value obj) {
-  if(!tsel_check_record_type(env, "tree-sitter-symbol", obj)) {
+  if(!tsel_check_record_type(env, "tree-sitter-symbol", obj, 1)) {
     return false;
   }
   // Get the code field

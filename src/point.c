@@ -41,7 +41,7 @@ bool tsel_point_init(emacs_env *env) {
 }
 
 bool tsel_point_p(emacs_env *env, emacs_value obj) {
-  if(!tsel_check_record_type(env, "tree-sitter-point", obj)) {
+  if(!tsel_check_record_type(env, "tree-sitter-point", obj, 2)) {
     return false;
   }
   emacs_value Qintegerp = env->intern(env, "integerp");
