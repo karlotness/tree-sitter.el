@@ -36,7 +36,6 @@ emacs_value tsel_tree_emacs_move(emacs_env *env, TSElTree *tree);
 void tsel_tree_retain(TSElTree *tree);
 void tsel_tree_release(TSElTree *tree);
 bool tsel_tree_p(emacs_env *env, emacs_value obj);
-TSElTree *tsel_tree_get_ptr(emacs_env *env, emacs_value obj);
 bool tsel_extract_tree(emacs_env *env, emacs_value obj, TSElTree **tree);
 
 #endif //ifndef TSEL_TREE_H

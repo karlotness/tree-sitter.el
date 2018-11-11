@@ -32,7 +32,6 @@ typedef struct TSElLanguage {
 
 bool tsel_language_init(emacs_env *env);
 bool tsel_language_p(emacs_env *env, emacs_value obj);
-TSElLanguage *tsel_language_get_ptr(emacs_env *env, emacs_value obj);
 bool tsel_extract_language(emacs_env *env, emacs_value obj, TSElLanguage **lang);
 emacs_value tsel_language_wrap(emacs_env *env, TSElLanguage *lang);
 

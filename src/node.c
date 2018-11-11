@@ -524,23 +524,6 @@ bool tsel_node_p(emacs_env *env, emacs_value obj) {
   return !tsel_pending_nonlocal_exit(env) && fin == &tsel_node_fin;
 }
 
-TSElNode *tsel_node_get_ptr(emacs_env *env, emacs_value obj) {
-  if(!tsel_node_p(env, obj)) {
-    return NULL;
-  }
-  // Get the ptr field
-  emacs_value user_ptr;
-  if(!tsel_record_get_field(env, obj, 1, &user_ptr)) {
-    return NULL;
-  }
-  // Get the raw pointer
-  TSElNode *ptr = env->get_user_ptr(env, user_ptr);
-  if(tsel_pending_nonlocal_exit(env)) {
-    return NULL;
-  }
-  return ptr;
-}
-
 bool tsel_extract_node(emacs_env *env, emacs_value obj, TSElNode **node) {
   if(!tsel_node_p(env, obj)) {
     tsel_signal_wrong_type(env, "tree-sitter-node-p", obj);
