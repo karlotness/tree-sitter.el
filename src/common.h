@@ -50,6 +50,7 @@ bool tsel_extract_string(emacs_env *env, emacs_value obj, char **res);
 void tsel_signal_error(emacs_env *env, char *message);
 bool tsel_integer_p(emacs_env *env, emacs_value obj);
 bool tsel_extract_integer(emacs_env *env, emacs_value obj, intmax_t *res);
+bool tsel_extract_buffer(emacs_env *env, emacs_value obj, emacs_value *res);
 
 extern emacs_value tsel_Qnil;
 extern emacs_value tsel_Qt;

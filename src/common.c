@@ -157,3 +157,14 @@ bool tsel_extract_integer(emacs_env *env, emacs_value obj, intmax_t *res) {
   }
   return true;
 }
+
+bool tsel_extract_buffer(emacs_env *env, emacs_value obj, emacs_value *res) {
+  emacs_value Qbufferp = env->intern(env, "bufferp");
+  if(!env->eq(env, tsel_Qt, env->funcall(env, Qbufferp, 1, &obj)) ||
+     tsel_pending_nonlocal_exit(env)) {
+    tsel_signal_wrong_type(env, "bufferp", obj);
+    return false;
+  }
+  *res = obj;
+  return true;
+}
