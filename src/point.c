@@ -44,14 +44,12 @@ bool tsel_point_p(emacs_env *env, emacs_value obj) {
   if(!tsel_check_record_type(env, "tree-sitter-point", obj, 2)) {
     return false;
   }
-  emacs_value Qintegerp = env->intern(env, "integerp");
   // Check that both fields are integers
   emacs_value val;
   if(!tsel_record_get_field(env, obj, 1, &val) ||
-     !env->eq(env, env->funcall(env, Qintegerp, 1, &val), tsel_Qt) ||
+     !tsel_integer_p(env, val) ||
      !tsel_record_get_field(env, obj, 2, &val) ||
-     !env->eq(env, env->funcall(env, Qintegerp, 1, &val), tsel_Qt) ||
-     tsel_pending_nonlocal_exit(env)) {
+     !tsel_integer_p(env, val)) {
     return false;
   }
   return true;
