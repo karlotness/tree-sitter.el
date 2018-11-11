@@ -53,15 +53,8 @@ static emacs_value tsel_node_symbol(emacs_env *env,
                                     __attribute__((unused)) ptrdiff_t nargs,
                                     emacs_value *args,
                                     __attribute__((unused)) void *data) {
-  if(!tsel_node_p(env, args[0])) {
-    tsel_signal_wrong_type(env, "tree-sitter-node-p", args[0]);
-    return tsel_Qnil;
-  }
-  TSElNode *node = tsel_node_get_ptr(env, args[0]);
-  if(!node || tsel_pending_nonlocal_exit(env)) {
-    tsel_signal_error(env, "Failed to retrieve node.");
-    return tsel_Qnil;
-  }
+  TSElNode *node;
+  TSEL_SUBR_EXTRACT(node, env, args[0], &node);
   TSSymbol symb = ts_node_symbol(node->node);
   emacs_value obj;
   if(!tsel_symbol_create(env, symb, &obj)) {
@@ -80,15 +73,8 @@ static emacs_value tsel_node_type(emacs_env *env,
                                   __attribute__((unused)) ptrdiff_t nargs,
                                   emacs_value *args,
                                   __attribute__((unused)) void *data) {
-  if(!tsel_node_p(env, args[0])) {
-    tsel_signal_wrong_type(env, "tree-sitter-node-p", args[0]);
-    return tsel_Qnil;
-  }
-  TSElNode *node = tsel_node_get_ptr(env, args[0]);
-  if(!node || tsel_pending_nonlocal_exit(env)) {
-    tsel_signal_error(env, "Failed to retrieve node.");
-    return tsel_Qnil;
-  }
+  TSElNode *node;
+  TSEL_SUBR_EXTRACT(node, env, args[0], &node);
   const char *name = ts_node_type(node->node);
   emacs_value str = env->make_string(env, name, strlen(name));
   return str;
@@ -101,15 +87,8 @@ static emacs_value tsel_node_start_byte(emacs_env *env,
                                         __attribute__((unused)) ptrdiff_t nargs,
                                         emacs_value *args,
                                         __attribute__((unused)) void *data) {
-  if(!tsel_node_p(env, args[0])) {
-    tsel_signal_wrong_type(env, "tree-sitter-node-p", args[0]);
-    return tsel_Qnil;
-  }
-  TSElNode *node = tsel_node_get_ptr(env, args[0]);
-  if(!node || tsel_pending_nonlocal_exit(env)) {
-    tsel_signal_error(env, "Failed to retrieve node.");
-    return tsel_Qnil;
-  }
+  TSElNode *node;
+  TSEL_SUBR_EXTRACT(node, env, args[0], &node);
   uint32_t byte = ts_node_start_byte(node->node);
   return env->make_integer(env, byte + 1);
 }
@@ -121,15 +100,8 @@ static emacs_value tsel_node_end_byte(emacs_env *env,
                                       __attribute__((unused)) ptrdiff_t nargs,
                                       emacs_value *args,
                                       __attribute__((unused)) void *data) {
-  if(!tsel_node_p(env, args[0])) {
-    tsel_signal_wrong_type(env, "tree-sitter-node-p", args[0]);
-    return tsel_Qnil;
-  }
-  TSElNode *node = tsel_node_get_ptr(env, args[0]);
-  if(!node || tsel_pending_nonlocal_exit(env)) {
-    tsel_signal_error(env, "Failed to retrieve node.");
-    return tsel_Qnil;
-  }
+  TSElNode *node;
+  TSEL_SUBR_EXTRACT(node, env, args[0], &node);
   uint32_t byte = ts_node_end_byte(node->node);
   return env->make_integer(env, byte + 1);
 }
@@ -143,15 +115,8 @@ static emacs_value tsel_node_start_point(emacs_env *env,
                                          __attribute__((unused)) ptrdiff_t nargs,
                                          emacs_value *args,
                                          __attribute__((unused)) void *data) {
-  if(!tsel_node_p(env, args[0])) {
-    tsel_signal_wrong_type(env, "tree-sitter-node-p", args[0]);
-    return tsel_Qnil;
-  }
-  TSElNode *node = tsel_node_get_ptr(env, args[0]);
-  if(!node || tsel_pending_nonlocal_exit(env)) {
-    tsel_signal_error(env, "Failed to retrieve node.");
-    return tsel_Qnil;
-  }
+  TSElNode *node;
+  TSEL_SUBR_EXTRACT(node, env, args[0], &node);
   TSPoint point = ts_node_start_point(node->node);
   return tsel_point_emacs_move(env, &point);
 }
@@ -165,15 +130,8 @@ static emacs_value tsel_node_end_point(emacs_env *env,
                                        __attribute__((unused)) ptrdiff_t nargs,
                                        emacs_value *args,
                                        __attribute__((unused)) void *data) {
-  if(!tsel_node_p(env, args[0])) {
-    tsel_signal_wrong_type(env, "tree-sitter-node-p", args[0]);
-    return tsel_Qnil;
-  }
-  TSElNode *node = tsel_node_get_ptr(env, args[0]);
-  if(!node || tsel_pending_nonlocal_exit(env)) {
-    tsel_signal_error(env, "Failed to retrieve node.");
-    return tsel_Qnil;
-  }
+  TSElNode *node;
+  TSEL_SUBR_EXTRACT(node, env, args[0], &node);
   TSPoint point = ts_node_end_point(node->node);
   return tsel_point_emacs_move(env, &point);
 }
@@ -187,17 +145,8 @@ static emacs_value tsel_node_eq(emacs_env *env,
                                 emacs_value *args,
                                 __attribute__((unused)) void *data) {
   TSElNode *nodes[2];
-  for(int i = 0; i < 2; i++) {
-    if(!tsel_node_p(env, args[i])) {
-      tsel_signal_wrong_type(env, "tree-sitter-node-p", args[i]);
-      return tsel_Qnil;
-    }
-    nodes[i] = tsel_node_get_ptr(env, args[i]);
-    if(!nodes[i] || tsel_pending_nonlocal_exit(env)) {
-      tsel_signal_error(env, "Failed to retrieve node.");
-      return tsel_Qnil;
-    }
-  }
+  TSEL_SUBR_EXTRACT(node, env, args[0], &nodes[0]);
+  TSEL_SUBR_EXTRACT(node, env, args[1], &nodes[1]);
   if(ts_node_eq(nodes[0]->node, nodes[0]->node)) {
     return tsel_Qt;
   }
@@ -211,15 +160,8 @@ static emacs_value tsel_node_predicate(emacs_env *env,
                                        emacs_value *args,
                                        void *data) {
   bool (**tsel_node_function) (TSNode) = data;
-  if(!tsel_node_p(env, args[0])) {
-    tsel_signal_wrong_type(env, "tree-sitter-node-p", args[0]);
-    return tsel_Qnil;
-  }
-  TSElNode *node = tsel_node_get_ptr(env, args[0]);
-  if(!node || tsel_pending_nonlocal_exit(env)) {
-    tsel_signal_error(env, "Failed to retrieve node.");
-    return tsel_Qnil;
-  }
+  TSElNode *node;
+  TSEL_SUBR_EXTRACT(node, env, args[0], &node);
   if((*tsel_node_function)(node->node)) {
     return tsel_Qt;
   }
@@ -246,15 +188,8 @@ static emacs_value tsel_node_parent(emacs_env *env,
                                     __attribute__((unused)) ptrdiff_t nargs,
                                     emacs_value *args,
                                     __attribute__((unused)) void *data) {
-  if(!tsel_node_p(env, args[0])) {
-    tsel_signal_wrong_type(env, "tree-sitter-node-p", args[0]);
-    return tsel_Qnil;
-  }
-  TSElNode *node = tsel_node_get_ptr(env, args[0]);
-  if(!node || tsel_pending_nonlocal_exit(env)) {
-    tsel_signal_error(env, "Failed to retrieve node.");
-    return tsel_Qnil;
-  }
+  TSElNode *node;
+  TSEL_SUBR_EXTRACT(node, env, args[0], &node);
   TSNode parent = ts_node_parent(node->node);
   TSElNode *wrapped = tsel_node_wrap(parent, node->tree);
   if(!wrapped) {
@@ -274,15 +209,8 @@ static emacs_value tsel_node_child_count(emacs_env *env,
                                          ptrdiff_t nargs,
                                          emacs_value *args,
                                          __attribute__((unused)) void *data) {
-  if(!tsel_node_p(env, args[0])) {
-    tsel_signal_wrong_type(env, "tree-sitter-node-p", args[0]);
-    return tsel_Qnil;
-  }
-  TSElNode *node = tsel_node_get_ptr(env, args[0]);
-  if(!node || tsel_pending_nonlocal_exit(env)) {
-    tsel_signal_error(env, "Failed to retrieve node.");
-    return tsel_Qnil;
-  }
+  TSElNode *node;
+  TSEL_SUBR_EXTRACT(node, env, args[0], &node);
   bool count_named = nargs > 1 && tsel_named_nodes(env, args[1]);
   if(count_named) {
     return env->make_integer(env, ts_node_named_child_count(node->node));
@@ -300,25 +228,14 @@ static emacs_value tsel_node_child(emacs_env *env,
                                    ptrdiff_t nargs,
                                    emacs_value *args,
                                    __attribute__((unused)) void *data) {
-  if(!tsel_node_p(env, args[0])) {
-    tsel_signal_wrong_type(env, "tree-sitter-node-p", args[0]);
-    return tsel_Qnil;
-  }
-  TSElNode *node = tsel_node_get_ptr(env, args[0]);
-  if(!node || tsel_pending_nonlocal_exit(env)) {
-    tsel_signal_error(env, "Failed to retrieve node.");
-    return tsel_Qnil;
-  }
-  if(!tsel_integer_p(env, args[1])) {
-    tsel_signal_wrong_type(env, "integerp", args[1]);
-    return tsel_Qnil;
-  }
+  TSElNode *node;
   intmax_t num;
+  TSEL_SUBR_EXTRACT(node, env, args[0], &node);
   TSEL_SUBR_EXTRACT(integer, env, args[1], &num);
+  bool count_named = nargs > 2 && tsel_named_nodes(env, args[2]);
   if(tsel_pending_nonlocal_exit(env)) {
     return tsel_Qnil;
   }
-  bool count_named = nargs > 2 && tsel_named_nodes(env, args[2]);
   TSNode child;
   if(count_named) {
     child = ts_node_named_child(node->node, num);
@@ -344,16 +261,12 @@ static emacs_value tsel_node_next_sibling(emacs_env *env,
                                           ptrdiff_t nargs,
                                           emacs_value *args,
                                           __attribute__((unused)) void *data) {
-  if(!tsel_node_p(env, args[0])) {
-    tsel_signal_wrong_type(env, "tree-sitter-node-p", args[0]);
-    return tsel_Qnil;
-  }
-  TSElNode *node = tsel_node_get_ptr(env, args[0]);
-  if(!node || tsel_pending_nonlocal_exit(env)) {
-    tsel_signal_error(env, "Failed to retrieve node.");
-    return tsel_Qnil;
-  }
+  TSElNode *node;
+  TSEL_SUBR_EXTRACT(node, env, args[0], &node);
   bool count_named = nargs > 1 && tsel_named_nodes(env, args[1]);
+  if(tsel_pending_nonlocal_exit(env)) {
+    return tsel_Qnil;
+  }
   TSNode sibling;
   if(count_named) {
     sibling = ts_node_next_named_sibling(node->node);
@@ -379,16 +292,12 @@ static emacs_value tsel_node_prev_sibling(emacs_env *env,
                                           ptrdiff_t nargs,
                                           emacs_value *args,
                                           __attribute__((unused)) void *data) {
-  if(!tsel_node_p(env, args[0])) {
-    tsel_signal_wrong_type(env, "tree-sitter-node-p", args[0]);
-    return tsel_Qnil;
-  }
-  TSElNode *node = tsel_node_get_ptr(env, args[0]);
-  if(!node || tsel_pending_nonlocal_exit(env)) {
-    tsel_signal_error(env, "Failed to retrieve node.");
-    return tsel_Qnil;
-  }
+  TSElNode *node;
+  TSEL_SUBR_EXTRACT(node, env, args[0], &node);
   bool count_named = nargs > 1 && tsel_named_nodes(env, args[1]);
+  if(tsel_pending_nonlocal_exit(env)) {
+    return tsel_Qnil;
+  }
   TSNode sibling;
   if(count_named) {
     sibling = ts_node_prev_named_sibling(node->node);
@@ -414,26 +323,15 @@ static emacs_value tsel_node_first_child_for_byte(emacs_env *env,
                                                   ptrdiff_t nargs,
                                                   emacs_value *args,
                                                   __attribute__((unused)) void *data) {
-  if(!tsel_node_p(env, args[0])) {
-    tsel_signal_wrong_type(env, "tree-sitter-node-p", args[0]);
-    return tsel_Qnil;
-  }
-  TSElNode *node = tsel_node_get_ptr(env, args[0]);
-  if(!node || tsel_pending_nonlocal_exit(env)) {
-    tsel_signal_error(env, "Failed to retrieve node.");
-    return tsel_Qnil;
-  }
-  if(!tsel_integer_p(env, args[1])) {
-    tsel_signal_wrong_type(env, "integerp", args[1]);
-    return tsel_Qnil;
-  }
+  TSElNode *node;
   intmax_t byte;
+  TSEL_SUBR_EXTRACT(node, env, args[0], &node);
   TSEL_SUBR_EXTRACT(integer, env, args[1], &byte);
   byte--;
+  bool count_named = nargs > 2 && tsel_named_nodes(env, args[2]);
   if(tsel_pending_nonlocal_exit(env)) {
     return tsel_Qnil;
   }
-  bool count_named = nargs > 2 && tsel_named_nodes(env, args[2]);
   TSNode child;
   if(count_named) {
     child = ts_node_first_named_child_for_byte(node->node, byte);
@@ -459,30 +357,17 @@ static emacs_value tsel_node_descendant_for_byte_range(emacs_env *env,
                                                        ptrdiff_t nargs,
                                                        emacs_value *args,
                                                        __attribute__((unused)) void *data) {
-  if(!tsel_node_p(env, args[0])) {
-    tsel_signal_wrong_type(env, "tree-sitter-node-p", args[0]);
-    return tsel_Qnil;
-  }
-  TSElNode *node = tsel_node_get_ptr(env, args[0]);
-  if(!node || tsel_pending_nonlocal_exit(env)) {
-    tsel_signal_error(env, "Failed to retrieve node.");
-    return tsel_Qnil;
-  }
-  for(int i = 1; i < 3; i++) {
-    if(!tsel_integer_p(env, args[i])) {
-      tsel_signal_wrong_type(env, "integerp", args[i]);
-      return tsel_Qnil;
-    }
-  }
+  TSElNode *node;
   intmax_t byte_start, byte_end;
+  TSEL_SUBR_EXTRACT(node, env, args[0], &node);
   TSEL_SUBR_EXTRACT(integer, env, args[1], &byte_start);
   TSEL_SUBR_EXTRACT(integer, env, args[2], &byte_end);
   byte_start--;
   byte_end--;
+  bool count_named = nargs > 3 && tsel_named_nodes(env, args[3]);
   if(tsel_pending_nonlocal_exit(env)) {
     return tsel_Qnil;
   }
-  bool count_named = nargs > 3 && tsel_named_nodes(env, args[3]);
   TSNode child;
   if(count_named) {
     child = ts_node_named_descendant_for_byte_range(node->node, byte_start, byte_end);
@@ -505,45 +390,19 @@ static emacs_value tsel_node_edit(emacs_env *env,
                                   __attribute__((unused)) ptrdiff_t nargs,
                                   emacs_value *args,
                                   __attribute__((unused)) void *data) {
-  // Check argument types
-  if(!tsel_node_p(env, args[0])) {
-    tsel_signal_wrong_type(env, "tree-sitter-node-p", args[0]);
-    return tsel_Qnil;
-  }
-  for(int i = 1; i < 4; i++) {
-    if(!tsel_integer_p(env, args[i])) {
-      tsel_signal_wrong_type(env, "integerp", args[i]);
-      return tsel_Qnil;
-    }
-  }
-  for(int i = 4; i < 7; i++) {
-    if(!tsel_point_p(env, args[i])) {
-      tsel_signal_wrong_type(env, "tree-sitter-point-p", args[i]);
-      return tsel_Qnil;
-    }
-  }
-  // Extract arguments
-  TSElNode *node = tsel_node_get_ptr(env, args[0]);
-  if(!node) {
-    tsel_signal_error(env, "Failed to get node.");
-    return tsel_Qnil;
-  }
   TSInputEdit edit;
+  TSElNode *node;
   intmax_t start_byte, old_end_byte, new_end_byte;
+  TSEL_SUBR_EXTRACT(node, env, args[0], &node);
   TSEL_SUBR_EXTRACT(integer, env, args[1], &start_byte);
   TSEL_SUBR_EXTRACT(integer, env, args[2], &old_end_byte);
   TSEL_SUBR_EXTRACT(integer, env, args[3], &new_end_byte);
   edit.start_byte = start_byte - 1;
   edit.old_end_byte = old_end_byte - 1;
   edit.new_end_byte = new_end_byte - 1;
-  if(!tsel_point_get_values(env, args[4], &edit.start_point.row, &edit.start_point.column) ||
-     !tsel_point_get_values(env, args[5], &edit.old_end_point.row, &edit.old_end_point.column) ||
-     !tsel_point_get_values(env, args[6], &edit.new_end_point.row, &edit.new_end_point.column)) {
-    tsel_signal_error(env, "Failed to extract points.");
-  }
-  if(tsel_pending_nonlocal_exit(env)) {
-    return tsel_Qnil;
-  }
+  TSEL_SUBR_EXTRACT(point, env, args[4], &edit.start_point);
+  TSEL_SUBR_EXTRACT(point, env, args[5], &edit.old_end_point);
+  TSEL_SUBR_EXTRACT(point, env, args[6], &edit.new_end_point);
   // Signal the edit
   ts_node_edit(&node->node, &edit);
   node->tree->dirty = true;

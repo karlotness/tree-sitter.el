@@ -85,15 +85,8 @@ static emacs_value tsel_parser_language(emacs_env *env,
                                         __attribute__((unused)) ptrdiff_t nargs,
                                         emacs_value *args,
                                         __attribute__((unused)) void *data) {
-  if(!tsel_parser_p(env, args[0])) {
-    tsel_signal_wrong_type(env, "tree-sitter-parser-p", args[0]);
-    return tsel_Qnil;
-  }
-  TSElParser *parse = tsel_parser_get_ptr(env, args[0]);
-  if(!parse) {
-    tsel_signal_error(env, "Failed to retrieve parser.");
-    return tsel_Qnil;
-  }
+  TSElParser *parse;
+  TSEL_SUBR_EXTRACT(parser, env, args[0], &parse);
   TSElLanguage *lang = parse->lang;
   if(!lang) {
     return tsel_Qnil;
@@ -137,50 +130,23 @@ static emacs_value tsel_parser_parse_buffer(emacs_env *env,
                                             ptrdiff_t nargs,
                                             emacs_value *args,
                                             __attribute__((unused)) void *data) {
-  if(!tsel_parser_p(env, args[0])) {
-    tsel_signal_wrong_type(env, "tree-sitter-parser-p", args[0]);
-    return tsel_Qnil;
-  }
-  // Check that second arg is a buffer
-  emacs_value Qbufferp = env->intern(env, "bufferp");
-  if(!env->eq(env, tsel_Qt, env->funcall(env, Qbufferp, 1, &args[1])) ||
-     tsel_pending_nonlocal_exit(env)) {
-    tsel_signal_wrong_type(env, "bufferp", args[1]);
-    return tsel_Qnil;
-  }
+  TSElParser *parser;
+  emacs_value buffer;
   TSElTree *tree = NULL;
-  // If we have a third arg, make sure it is a tree
-  if(nargs >= 3 && !env->eq(env, tsel_Qnil, args[2])) {
-    if(!tsel_tree_p(env, args[2]) || tsel_pending_nonlocal_exit(env)) {
-      tsel_signal_wrong_type(env, "tree-sitter-tree-p", args[2]);
-      return tsel_Qnil;
-    }
-    else {
-      TSElTree *init_tree = tsel_tree_get_ptr(env, args[2]);
-      if(init_tree) {
-        tree = init_tree;
-      }
-    }
-    if(tsel_pending_nonlocal_exit(env)) {
-      tsel_signal_error(env, "Failed to get tree");
-      return tsel_Qnil;
-    }
+  TSEL_SUBR_EXTRACT(parser, env, args[0], &parser);
+  TSEL_SUBR_EXTRACT(buffer, env, args[1], &buffer);
+  if(nargs > 2) {
+    TSEL_SUBR_EXTRACT(tree, env, args[2], &tree);
   }
   struct tsel_parser_buffer_payload payload = {.env = env,
-                                               .buffer = args[1]};
+                                               .buffer = buffer};
   TSInput input_def = {.payload = &payload,
                        .encoding = TSInputEncodingUTF8,
                        .read = &tsel_parser_read_buffer_function};
-  TSElParser *wrapped_parser = tsel_parser_get_ptr(env, args[0]);
-  if(!wrapped_parser) {
-    tsel_signal_error(env, "Failed to retrieve parser.");
-    return tsel_Qnil;
-  }
-  TSParser *parse = wrapped_parser->parser;
   TSTree *new_tree = NULL;
   if(!tree || tree->dirty) {
     // No tree given or tree is dirty
-    new_tree = ts_parser_parse(parse, tree ? tree->tree : NULL, input_def);
+    new_tree = ts_parser_parse(parser->parser, tree ? tree->tree : NULL, input_def);
   }
   else {
     // Tree is specified but not dirty, just make a copy
@@ -204,33 +170,19 @@ static emacs_value tsel_parser_set_language(emacs_env *env,
                                             __attribute__((unused)) ptrdiff_t nargs,
                                             emacs_value *args,
                                             __attribute__((unused)) void *data) {
-  if(!tsel_parser_p(env, args[0])) {
-    tsel_signal_wrong_type(env, "tree-sitter-parser-p", args[0]);
-    return tsel_Qnil;
-  }
-  bool lang_is_nil = env->eq(env, args[1], tsel_Qnil);
-  if((!tsel_language_p(env, args[1]) && !lang_is_nil) ||
-     tsel_pending_nonlocal_exit(env)) {
-    tsel_signal_wrong_type(env, "tree-sitter-language-p", args[1]);
-    return tsel_Qnil;
-  }
-  TSElParser *parse = tsel_parser_get_ptr(env, args[0]);
-  if(!parse) {
-    tsel_signal_error(env, "Failed to retrieve parser.");
-    return tsel_Qnil;
-  }
+  TSElParser *parser;
   TSElLanguage *lang = NULL;
-  TSLanguage *raw_lang = NULL;
+  TSEL_SUBR_EXTRACT(parser, env, args[0], &parser);
+  bool lang_is_nil = env->eq(env, args[1], tsel_Qnil);
   if(!lang_is_nil) {
-    lang = tsel_language_get_ptr(env, args[1]);
-    raw_lang = lang->ptr;
+    TSEL_SUBR_EXTRACT(language, env, args[1], &lang);
   }
   if(tsel_pending_nonlocal_exit(env) ||
-     !ts_parser_set_language(parse->parser, raw_lang)) {
+     !ts_parser_set_language(parser->parser, lang ? lang->ptr : NULL)) {
     tsel_signal_error(env, "Failed to set language");
     return tsel_Qnil;
   }
-  parse->lang = lang;
+  parser->lang = lang;
   return tsel_Qnil;
 }
 

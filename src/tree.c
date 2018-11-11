@@ -47,15 +47,8 @@ static emacs_value tsel_tree_root_node(emacs_env *env,
                                        __attribute__((unused)) ptrdiff_t nargs,
                                        emacs_value *args,
                                        __attribute__((unused)) void *data) {
-  if(!tsel_tree_p(env, args[0])) {
-    tsel_signal_wrong_type(env, "tree-sitter-tree-p", args[0]);
-    return tsel_Qnil;
-  }
-  TSElTree *tree = tsel_tree_get_ptr(env, args[0]);
-  if(!tree) {
-    tsel_signal_error(env, "Failed to get tree.");
-    return tsel_Qnil;
-  }
+  TSElTree *tree;
+  TSEL_SUBR_EXTRACT(tree, env, args[0], &tree);
   TSNode root = ts_tree_root_node(tree->tree);
   TSElNode *wrapped = tsel_node_wrap(root, tree);
   if(!wrapped) {
@@ -77,15 +70,8 @@ static emacs_value tsel_tree_copy(emacs_env *env,
                                        __attribute__((unused)) ptrdiff_t nargs,
                                        emacs_value *args,
                                        __attribute__((unused)) void *data) {
-  if(!tsel_tree_p(env, args[0])) {
-    tsel_signal_wrong_type(env, "tree-sitter-tree-p", args[0]);
-    return tsel_Qnil;
-  }
-  TSElTree *tree = tsel_tree_get_ptr(env, args[0]);
-  if(!tree) {
-    tsel_signal_error(env, "Failed to get tree.");
-    return tsel_Qnil;
-  }
+  TSElTree *tree;
+  TSEL_SUBR_EXTRACT(tree, env, args[0], &tree);
   TSTree *new_tree = ts_tree_copy(tree->tree);
   TSElTree *wrapped_tree = tsel_tree_wrap(new_tree);
   emacs_value emacs_tree = tsel_tree_emacs_move(env, wrapped_tree);
@@ -104,45 +90,19 @@ static emacs_value tsel_tree_edit(emacs_env *env,
                                   __attribute__((unused)) ptrdiff_t nargs,
                                   emacs_value *args,
                                   __attribute__((unused)) void *data) {
-  // Check argument types
-  if(!tsel_tree_p(env, args[0])) {
-    tsel_signal_wrong_type(env, "tree-sitter-tree-p", args[0]);
-    return tsel_Qnil;
-  }
-  for(int i = 1; i < 4; i++) {
-    if(!tsel_integer_p(env, args[i])) {
-      tsel_signal_wrong_type(env, "integerp", args[i]);
-      return tsel_Qnil;
-    }
-  }
-  for(int i = 4; i < 7; i++) {
-    if(!tsel_point_p(env, args[i])) {
-      tsel_signal_wrong_type(env, "tree-sitter-point-p", args[i]);
-      return tsel_Qnil;
-    }
-  }
-  // Extract arguments
-  TSElTree *tree = tsel_tree_get_ptr(env, args[0]);
-  if(!tree) {
-    tsel_signal_error(env, "Failed to get tree.");
-    return tsel_Qnil;
-  }
   TSInputEdit edit;
+  TSElTree *tree;
   intmax_t start_byte, old_end_byte, new_end_byte;
+  TSEL_SUBR_EXTRACT(tree, env, args[0], &tree);
   TSEL_SUBR_EXTRACT(integer, env, args[1], &start_byte);
   TSEL_SUBR_EXTRACT(integer, env, args[2], &old_end_byte);
   TSEL_SUBR_EXTRACT(integer, env, args[3], &new_end_byte);
   edit.start_byte = start_byte - 1;
   edit.old_end_byte = old_end_byte - 1;
   edit.new_end_byte = new_end_byte - 1;
-  if(!tsel_point_get_values(env, args[4], &edit.start_point.row, &edit.start_point.column) ||
-     !tsel_point_get_values(env, args[5], &edit.old_end_point.row, &edit.old_end_point.column) ||
-     !tsel_point_get_values(env, args[6], &edit.new_end_point.row, &edit.new_end_point.column)) {
-    tsel_signal_error(env, "Failed to extract points.");
-  }
-  if(tsel_pending_nonlocal_exit(env)) {
-    return tsel_Qnil;
-  }
+  TSEL_SUBR_EXTRACT(point, env, args[4], &edit.start_point);
+  TSEL_SUBR_EXTRACT(point, env, args[5], &edit.old_end_point);
+  TSEL_SUBR_EXTRACT(point, env, args[6], &edit.new_end_point);
   // Signal the edit
   ts_tree_edit(tree->tree, &edit);
   tree->dirty = true;
