@@ -135,7 +135,7 @@ static emacs_value tsel_parser_parse_buffer(emacs_env *env,
   TSElTree *tree = NULL;
   TSEL_SUBR_EXTRACT(parser, env, args[0], &parser);
   TSEL_SUBR_EXTRACT(buffer, env, args[1], &buffer);
-  if(nargs > 2) {
+  if(nargs > 2 && !env->eq(env, args[2], tsel_Qnil)) {
     TSEL_SUBR_EXTRACT(tree, env, args[2], &tree);
   }
   struct tsel_parser_buffer_payload payload = {.env = env,
