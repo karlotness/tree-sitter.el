@@ -50,17 +50,7 @@ static emacs_value tsel_tree_root_node(emacs_env *env,
   TSElTree *tree;
   TSEL_SUBR_EXTRACT(tree, env, args[0], &tree);
   TSNode root = ts_tree_root_node(tree->tree);
-  TSElNode *wrapped = tsel_node_wrap(root, tree);
-  if(!wrapped) {
-    tsel_signal_error(env, "Allocation failed.");
-    return tsel_Qnil;
-  }
-  emacs_value res = tsel_node_emacs_move(env, wrapped);
-  if(tsel_pending_nonlocal_exit(env)) {
-    tsel_signal_error(env, "Allocation failed.");
-    return tsel_Qnil;
-  }
-  return res;
+  return tsel_node_emacs_move(env, root, tree);
 }
 
 static const char *tsel_tree_copy_doc = "Return a shallow copy of TREE.\n"
@@ -73,14 +63,7 @@ static emacs_value tsel_tree_copy(emacs_env *env,
   TSElTree *tree;
   TSEL_SUBR_EXTRACT(tree, env, args[0], &tree);
   TSTree *new_tree = ts_tree_copy(tree->tree);
-  TSElTree *wrapped_tree = tsel_tree_wrap(new_tree);
-  emacs_value emacs_tree = tsel_tree_emacs_move(env, wrapped_tree);
-  if(!wrapped_tree || tsel_pending_nonlocal_exit(env)) {
-    tsel_tree_release(wrapped_tree);
-    tsel_signal_error(env, "Failed to initialize new tree");
-    return tsel_Qnil;
-  }
-  return emacs_tree;
+  return tsel_tree_emacs_move(env, new_tree);
 }
 
 static const char *tsel_tree_edit_doc = "Mark a portion of TREE as edited.\n"
@@ -125,26 +108,23 @@ bool tsel_tree_init(emacs_env *env) {
   return function_result;
 }
 
-TSElTree *tsel_tree_wrap(TSTree *tree) {
+emacs_value tsel_tree_emacs_move(emacs_env *env, TSTree *tree) {
+  if(!tree) {
+    return tsel_Qnil;
+  }
   TSElTree *wrapper = malloc(sizeof(TSElTree));
   if(!wrapper) {
-    return NULL;
+    ts_tree_delete(tree);
+    tsel_signal_error(env, "Failed to allocate tree.");
+    return tsel_Qnil;
   }
   wrapper->refcount = 1;
   wrapper->tree = tree;
   wrapper->dirty = false;
-  return wrapper;
-}
-
-emacs_value tsel_tree_emacs_move(emacs_env *env, TSElTree *tree) {
-  if(!tree->tree) {
-    tsel_tree_release(tree);
-    return tsel_Qnil;
-  }
-  emacs_value Qts_language_create = env->intern(env, "tree-sitter-tree--create");
-  emacs_value user_ptr = env->make_user_ptr(env, &tsel_tree_fin, tree);
+  emacs_value Qts_tree_create = env->intern(env, "tree-sitter-tree--create");
+  emacs_value user_ptr = env->make_user_ptr(env, &tsel_tree_fin, wrapper);
   emacs_value func_args[1] = { user_ptr };
-  return env->funcall(env, Qts_language_create, 1, func_args);
+  return env->funcall(env, Qts_tree_create, 1, func_args);
 }
 
 void tsel_tree_retain(TSElTree *tree) {

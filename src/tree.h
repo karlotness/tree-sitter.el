@@ -31,8 +31,7 @@ typedef struct TSElTree {
 } TSElTree;
 
 bool tsel_tree_init(emacs_env *env);
-TSElTree *tsel_tree_wrap(TSTree *tree);
-emacs_value tsel_tree_emacs_move(emacs_env *env, TSElTree *tree);
+emacs_value tsel_tree_emacs_move(emacs_env *env, TSTree *tree);
 void tsel_tree_retain(TSElTree *tree);
 void tsel_tree_release(TSElTree *tree);
 bool tsel_tree_p(emacs_env *env, emacs_value obj);

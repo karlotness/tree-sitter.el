@@ -152,14 +152,7 @@ static emacs_value tsel_parser_parse_buffer(emacs_env *env,
     // Tree is specified but not dirty, just make a copy
     new_tree = ts_tree_copy(tree->tree);
   }
-  TSElTree *wrapped_tree = tsel_tree_wrap(new_tree);
-  emacs_value emacs_tree = tsel_tree_emacs_move(env, wrapped_tree);
-  if(!wrapped_tree || tsel_pending_nonlocal_exit(env)) {
-    tsel_tree_release(wrapped_tree);
-    tsel_signal_error(env, "Failed to initialize new tree");
-    return tsel_Qnil;
-  }
-  return emacs_tree;
+  return tsel_tree_emacs_move(env, new_tree);
 }
 
 

@@ -191,12 +191,7 @@ static emacs_value tsel_node_parent(emacs_env *env,
   TSElNode *node;
   TSEL_SUBR_EXTRACT(node, env, args[0], &node);
   TSNode parent = ts_node_parent(node->node);
-  TSElNode *wrapped = tsel_node_wrap(parent, node->tree);
-  if(!wrapped) {
-    tsel_signal_error(env, "Allocation failed.");
-    return tsel_Qnil;
-  }
-  return tsel_node_emacs_move(env, wrapped);
+  return tsel_node_emacs_move(env, parent, node->tree);
 }
 
 static const char *tsel_node_child_count_doc = "Return the number of children of NODE.\n"
@@ -243,12 +238,7 @@ static emacs_value tsel_node_child(emacs_env *env,
   else {
     child = ts_node_child(node->node, num);
   }
-  TSElNode *wrapped = tsel_node_wrap(child, node->tree);
-  if(!wrapped) {
-    tsel_signal_error(env, "Allocation failed.");
-    return tsel_Qnil;
-  }
-  return tsel_node_emacs_move(env, wrapped);
+  return tsel_node_emacs_move(env, child, node->tree);
 }
 
 static const char *tsel_node_next_sibling_doc = "Return next sibling of NODE.\n"
@@ -274,12 +264,7 @@ static emacs_value tsel_node_next_sibling(emacs_env *env,
   else {
     sibling = ts_node_next_sibling(node->node);
   }
-  TSElNode *wrapped = tsel_node_wrap(sibling, node->tree);
-  if(!wrapped) {
-    tsel_signal_error(env, "Allocation failed.");
-    return tsel_Qnil;
-  }
-  return tsel_node_emacs_move(env, wrapped);
+  return tsel_node_emacs_move(env, sibling, node->tree);
 }
 
 static const char *tsel_node_prev_sibling_doc = "Return previous sibling of NODE.\n"
@@ -305,12 +290,7 @@ static emacs_value tsel_node_prev_sibling(emacs_env *env,
   else {
     sibling = ts_node_prev_sibling(node->node);
   }
-  TSElNode *wrapped = tsel_node_wrap(sibling, node->tree);
-  if(!wrapped) {
-    tsel_signal_error(env, "Allocation failed.");
-    return tsel_Qnil;
-  }
-  return tsel_node_emacs_move(env, wrapped);
+  return tsel_node_emacs_move(env, sibling, node->tree);
 }
 
 static const char *tsel_node_first_child_for_byte_doc = "Return first child of NODE for BYTE.\n"
@@ -339,12 +319,7 @@ static emacs_value tsel_node_first_child_for_byte(emacs_env *env,
   else {
     child = ts_node_first_child_for_byte(node->node, byte);
   }
-  TSElNode *wrapped = tsel_node_wrap(child, node->tree);
-  if(!wrapped) {
-    tsel_signal_error(env, "Allocation failed.");
-    return tsel_Qnil;
-  }
-  return tsel_node_emacs_move(env, wrapped);
+  return tsel_node_emacs_move(env, child, node->tree);
 }
 
 static const char *tsel_node_descendant_for_byte_range_doc = "Return descendant of NODE for byte range START to END.\n"
@@ -375,12 +350,7 @@ static emacs_value tsel_node_descendant_for_byte_range(emacs_env *env,
   else {
     child = ts_node_descendant_for_byte_range(node->node, byte_start, byte_end);
   }
-  TSElNode *wrapped = tsel_node_wrap(child, node->tree);
-  if(!wrapped) {
-    tsel_signal_error(env, "Allocation failed.");
-    return tsel_Qnil;
-  }
-  return tsel_node_emacs_move(env, wrapped);
+  return tsel_node_emacs_move(env, child, node->tree);
 }
 
 static const char *tsel_node_edit_doc = "Mark NODE as edited.\n"
@@ -473,17 +443,6 @@ bool tsel_node_init(emacs_env *env) {
   return function_result;
 }
 
-TSElNode *tsel_node_wrap(TSNode node, TSElTree *tree) {
-  TSElNode *new = malloc(sizeof(TSElNode));
-  if(!new) {
-    return NULL;
-  }
-  tsel_tree_retain(tree);
-  new->tree = tree;
-  new->node = node;
-  return new;
-}
-
 void tsel_node_free(TSElNode *node) {
   if(!node) {
     return;
@@ -492,15 +451,22 @@ void tsel_node_free(TSElNode *node) {
   free(node);
 }
 
-emacs_value tsel_node_emacs_move(emacs_env *env, TSElNode *tree) {
-  if(ts_node_is_null(tree->node)) {
-    tsel_node_fin(tree);
+emacs_value tsel_node_emacs_move(emacs_env *env, TSNode node, TSElTree *tree) {
+  if(ts_node_is_null(node)) {
     return tsel_Qnil;
   }
-  emacs_value Qts_language_create = env->intern(env, "tree-sitter-node--create");
+  TSElNode *new = malloc(sizeof(TSElNode));
+  if(!new) {
+    tsel_signal_error(env, "Failed to allocate node.");
+    return tsel_Qnil;
+  }
+  tsel_tree_retain(tree);
+  new->tree = tree;
+  new->node = node;
+  emacs_value Qts_node_create = env->intern(env, "tree-sitter-node--create");
   emacs_value user_ptr = env->make_user_ptr(env, &tsel_node_fin, tree);
   emacs_value func_args[1] = { user_ptr };
-  return env->funcall(env, Qts_language_create, 1, func_args);
+  return env->funcall(env, Qts_node_create, 1, func_args);
 }
 
 bool tsel_node_p(emacs_env *env, emacs_value obj) {
