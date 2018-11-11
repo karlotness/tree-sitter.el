@@ -21,6 +21,7 @@
 #include "common.h"
 #include "node.h"
 #include "point.h"
+#include "range.h"
 
 static void tsel_tree_fin(void *ptr) {
   TSElTree *tree = ptr;
@@ -92,6 +93,41 @@ static emacs_value tsel_tree_edit(emacs_env *env,
   return tsel_Qt;
 }
 
+static const char *tsel_tree_changed_ranges_doc = "Return a list of changed ranges between TREE-A and TREE-B.\n"
+  "\n"
+  "(fn TREE-A TREE-B)";
+static emacs_value tsel_tree_changed_ranges(emacs_env *env,
+                                            __attribute__((unused)) ptrdiff_t nargs,
+                                            emacs_value *args,
+                                            __attribute__((unused)) void *data) {
+  TSElTree *tree_a, *tree_b;
+  TSEL_SUBR_EXTRACT(tree, env, args[0], &tree_a);
+  TSEL_SUBR_EXTRACT(tree, env, args[1], &tree_b);
+
+  uint32_t count = 0;
+  TSRange *ptr = ts_tree_get_changed_ranges(tree_a->tree, tree_b->tree, &count);
+  if(count == 0) {
+    return tsel_Qnil;
+  }
+  if(!ptr) {
+    tsel_signal_error(env, "Error getting ranges.");
+    return tsel_Qnil;
+  }
+  emacs_value Qcons = env->intern(env, "cons");
+  emacs_value list = tsel_Qnil;
+  for(size_t i = 0; i < count; i++) {
+    TSRange *range = &ptr[count - i - 1];
+    emacs_value args[2];
+    args[0] = tsel_range_emacs_move(env, range);
+    args[1] = list;
+    list = env->funcall(env, Qcons, 2, args);
+    if(tsel_pending_nonlocal_exit(env)) {
+      return tsel_Qnil;
+    }
+  }
+  return list;
+}
+
 bool tsel_tree_init(emacs_env *env) {
   bool function_result = tsel_define_function(env, "tree-sitter-tree-p",
                                               &tsel_tree_p_wrapped, 1, 1,
@@ -105,6 +141,9 @@ bool tsel_tree_init(emacs_env *env) {
   function_result &= tsel_define_function(env, "tree-sitter-tree-edit",
                                           &tsel_tree_edit, 7, 7,
                                           tsel_tree_edit_doc, NULL);
+  function_result &= tsel_define_function(env, "tree-sitter-tree-changed-ranges",
+                                          &tsel_tree_changed_ranges, 2, 2,
+                                          tsel_tree_changed_ranges_doc, NULL);
   return function_result;
 }
 

@@ -21,12 +21,12 @@
 - [ ] ts_parser_reset
 - [ ] ts_parser_set_included_ranges
 - [ ] ts_parser_included_ranges
-*** Tree [71%]
+*** Tree [85%]
 - [X] ts_tree_copy
 - [X] ts_tree_delete
 - [X] ts_tree_root_node
 - [X] ts_tree_edit
-- [ ] ts_tree_get_changed_ranges
+- [X] ts_tree_get_changed_ranges
 - [X] ts_tree_print_dot_graph
   - Not implementing. Requires specifying a ~FILE *~ pointer.
 - [ ] ts_tree_language
