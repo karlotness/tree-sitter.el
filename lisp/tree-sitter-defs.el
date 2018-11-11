@@ -96,5 +96,26 @@ Users should not call this function."
              (end (tree-sitter--coerce-byte buf (+ byte-pos read-len))))
         (buffer-substring-no-properties start end)))))
 
+(defun tree-sitter-range--create (start-point end-point start-byte end-byte)
+  "Create a new tree-sitter-range record.
+Users should not call this function."
+  (record 'tree-sitter-range start-point end-point start-byte end-byte))
+
+(defun tree-sitter-range-start-point (range)
+  "Return the start point of a tree-sitter-range record, RANGE."
+  (aref range 1))
+
+(defun tree-sitter-range-end-point (range)
+  "Return the end point of a tree-sitter-range record, RANGE."
+  (aref range 2))
+
+(defun tree-sitter-range-start-byte (range)
+  "Return the start byte of a tree-sitter-range record, RANGE."
+  (aref range 3))
+
+(defun tree-sitter-range-end-byte (range)
+  "Return the end byte of a tree-sitter-range record, RANGE."
+  (aref range 4))
+
 (provide 'tree-sitter-defs)
 ;;; tree-sitter-defs.el ends here
