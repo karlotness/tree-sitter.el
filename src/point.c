@@ -86,6 +86,32 @@ bool tsel_point_get_values(emacs_env *env, emacs_value point, uint32_t *row, uin
   return true;
 }
 
+bool tsel_extract_point(emacs_env *env, emacs_value obj, TSPoint *point) {
+  if(!tsel_point_p(env, obj)) {
+    tsel_signal_wrong_type(env, "tree-sitter-point-p", obj);
+    return false;
+  }
+  for(int i = 0; i < 2; i++) {
+    // Get the field
+    emacs_value val;
+    if(!tsel_record_get_field(env, obj, i + 1, &val)) {
+      return false;
+    }
+    intmax_t num = env->extract_integer(env, val);
+    if(tsel_pending_nonlocal_exit(env)) {
+      return false;
+    }
+    if(i == 0) {
+      // Correct for fact that Emacs rows are indexed from 1
+      point->row = num - 1;
+    }
+    else {
+      point->column = num;
+    }
+  }
+  return true;
+}
+
 emacs_value tsel_point_emacs_move(emacs_env *env, const TSPoint *point) {
   emacs_value Qts_point_create = env->intern(env, "tree-sitter-point--create");
   emacs_value args[2];

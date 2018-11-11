@@ -27,6 +27,7 @@
 bool tsel_point_init(emacs_env *env);
 bool tsel_point_p(emacs_env *env, emacs_value obj);
 bool tsel_point_get_values(emacs_env *env, emacs_value point, uint32_t *row, uint32_t *col);
+bool tsel_extract_point(emacs_env *env, emacs_value obj, TSPoint *point);
 emacs_value tsel_point_emacs_move(emacs_env *env, const TSPoint *point);
 
 #endif //ifndef TSEL_POINT_H
