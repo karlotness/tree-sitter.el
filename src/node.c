@@ -375,7 +375,6 @@ static emacs_value tsel_node_edit(emacs_env *env,
   TSEL_SUBR_EXTRACT(point, env, args[6], &edit.new_end_point);
   // Signal the edit
   ts_node_edit(&node->node, &edit);
-  node->tree->dirty = true;
   return tsel_Qt;
 }
 
