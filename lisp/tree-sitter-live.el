@@ -32,12 +32,32 @@
 (require 'tree-sitter-defs)
 (require 'tree-sitter-module)
 
-(defgroup tree-sitter-live nil
-  "Options controlling live parsing of buffers with tree-sitter.")
-
+
+;; Internal variables
 (defvar tree-sitter-live--idle-timer nil
   "Idle timer for tree-sitter-live.")
 
+(defvar tree-sitter-live-auto-alist nil
+  "Alist specifying tree-sitter languages by major mode symbols.
+Each entry is a pair of (MODE . LANG) where MODE is a major-mode
+symbol and LANG is a tree-sitter language")
+
+(defvar tree-sitter-live--pending-buffers nil
+  "List of buffers which need to be re-parsed at next idle interval.")
+
+
+;; Internal buffer-local variables
+(defvar-local tree-sitter-live--parser nil
+  "Tree-sitter parser used to parse this buffer.")
+
+(defvar-local tree-sitter-live-tree nil
+  "Tree-sitter tree for the current buffer.")
+
+;; Store [start_byte old_end_byte start_point old_end_point]
+(defvar-local tree-sitter-live--before-change nil
+  "Internal value for tracking old buffer locations")
+
+;; Internal functions
 (defun tree-sitter-live--set-idle-time (symbol value)
   (set-default symbol value)
   (tree-sitter-live-reset-idle-timer))
@@ -51,69 +71,6 @@ If the timer does not exist and FORCE is nil, do nothing."
     (setq tree-sitter-live--idle-timer
           (run-with-idle-timer tree-sitter-live-idle-time
                                t #'tree-sitter-live--idle-update))))
-
-(defcustom tree-sitter-live-idle-time 0.25
-  "Idle time in seconds before re-parsing buffers with tree-sitter.
-
-If you set this value outside customize call
-`tree-sitter-live-reset-idle-timer' with no arguments so that the
-value can take effect."
-  :type 'float
-  :set 'tree-sitter-live--set-idle-time
-  :group 'tree-sitter-live)
-(defcustom tree-sitter-live-after-parse-functions nil
-  "Functions to call after a buffer is re-parsed with tree-sitter.
-The affected buffer is current while this hook is running.
-Functions are called with one argument: the old tree from before
-the most recent re-parse. The current tree is stored in the
-variable `tree-sitter-live-tree'.
-
-Note that after the initial parse of the buffer, the old tree
-value provided to these functions will be nil."
-  :type 'hook
-  :group 'tree-sitter-live)
-
-(defvar tree-sitter-live-auto-alist nil
-  "Alist specifying tree-sitter languages by major mode symbols.
-Each entry is a pair of (MODE . LANG) where MODE is a major-mode
-symbol and LANG is a tree-sitter language")
-(defvar tree-sitter-live--pending-buffers nil
-  "List of buffers which need to be re-parsed at next idle interval.")
-
-(defvar-local tree-sitter-live--parser nil
-  "Tree-sitter parser used to parse this buffer.")
-(defvar-local tree-sitter-live-tree nil
-  "Tree-sitter tree for the current buffer.")
-;; Store [start_byte old_end_byte start_point old_end_point]
-(defvar-local tree-sitter-live--before-change nil
-  "Internal value for tracking old buffer locations")
-
-(define-minor-mode tree-sitter-live-mode
-  "Minor mode which parses a buffer during idle time with tree-sitter.
-
-The language to use is chosen based on `tree-sitter-live-auto-alist'."
-  :lighter ""
-  :group 'tree-sitter-live
-  (if tree-sitter-live-mode
-      ;; Enabling the mode
-      (let ((auto-lang (tree-sitter-live--auto-language)))
-        (if auto-lang
-            (tree-sitter-live--setup auto-lang)
-          (error "No tree-sitter language specified for mode %s" major-mode)))
-    ;; Disabling the mode
-    (tree-sitter-live--teardown)))
-
-
-(defun tree-sitter-live-mode-turn-on ()
-  "Maybe enable `tree-sitter-live-mode' for a buffer.
-Enable the mode if a language is defined for its major mode in
-`tree-sitter-live-auto-alist'."
-  (when (tree-sitter-live--auto-language)
-    (tree-sitter-live-mode)))
-
-(define-globalized-minor-mode global-tree-sitter-live-mode
-  tree-sitter-live-mode tree-sitter-live-mode-turn-on
-  :group 'tree-sitter-live)
 
 (defun tree-sitter-live--before-change (beg end)
   "Hook for `before-change-functions'."
@@ -184,6 +141,63 @@ LANGUAGE must be a tree-sitter-language record."
 (defun tree-sitter-live--teardown ()
   (remove-hook 'before-change-functions #'tree-sitter-live--before-change t)
   (remove-hook 'after-change-functions #'tree-sitter-live--after-change t))
+
+
+;; Other functions
+(defun tree-sitter-live-mode-turn-on ()
+  "Maybe enable `tree-sitter-live-mode' for a buffer.
+Enable the mode if a language is defined for its major mode in
+`tree-sitter-live-auto-alist'."
+  (when (tree-sitter-live--auto-language)
+    (tree-sitter-live-mode)))
+
+
+;; Custom definitions
+(defgroup tree-sitter-live nil
+  "Options controlling live parsing of buffers with tree-sitter.")
+
+(defcustom tree-sitter-live-idle-time 0.25
+  "Idle time in seconds before re-parsing buffers with tree-sitter.
+
+If you set this value outside customize call
+`tree-sitter-live-reset-idle-timer' with no arguments so that the
+value can take effect."
+  :type 'float
+  :set 'tree-sitter-live--set-idle-time
+  :group 'tree-sitter-live)
+
+(defcustom tree-sitter-live-after-parse-functions nil
+  "Functions to call after a buffer is re-parsed with tree-sitter.
+The affected buffer is current while this hook is running.
+Functions are called with one argument: the old tree from before
+the most recent re-parse. The current tree is stored in the
+variable `tree-sitter-live-tree'.
+
+Note that after the initial parse of the buffer, the old tree
+value provided to these functions will be nil."
+  :type 'hook
+  :group 'tree-sitter-live)
+
+
+;; Minor modes
+(define-minor-mode tree-sitter-live-mode
+  "Minor mode which parses a buffer during idle time with tree-sitter.
+
+The language to use is chosen based on `tree-sitter-live-auto-alist'."
+  :lighter ""
+  :group 'tree-sitter-live
+  (if tree-sitter-live-mode
+      ;; Enabling the mode
+      (let ((auto-lang (tree-sitter-live--auto-language)))
+        (if auto-lang
+            (tree-sitter-live--setup auto-lang)
+          (error "No tree-sitter language specified for mode %s" major-mode)))
+    ;; Disabling the mode
+    (tree-sitter-live--teardown)))
+
+(define-globalized-minor-mode global-tree-sitter-live-mode
+  tree-sitter-live-mode tree-sitter-live-mode-turn-on
+  :group 'tree-sitter-live)
 
 (provide 'tree-sitter-live)
 ;;; tree-sitter-defs.el ends here
