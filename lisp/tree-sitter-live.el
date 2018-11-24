@@ -21,10 +21,11 @@
 ;;; Commentary:
 
 ;; Live incremental parsing for buffers. Enable in a buffer using
-;; `tree-sitter-live-setup'. Buffers are parsed using tree-sitter
-;; after Emacs is idle for the number of seconds specified by
-;; `tree-sitter-live-idle-time'. After the buffer is re-parsed, the
-;; hook `tree-sitter-live-after-parse-hook' is run with the affected
+;; `tree-sitter-live-mode' or `global-tree-sitter-live-mode'. Buffers
+;; are parsed using tree-sitter after Emacs is idle for the number of
+;; seconds specified by `tree-sitter-live-idle-time'. After the buffer
+;; is re-parsed, the functions in
+;; `tree-sitter-live-after-parse-functions' are run with the affected
 ;; buffer as current. The updated tree is stored in
 ;; `tree-sitter-live-tree'.
 
