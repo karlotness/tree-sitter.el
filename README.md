@@ -26,10 +26,11 @@ module depends the tree-sitter runtime and will also require a native
 module for parsing each language.
 
 ### Libtreesitter
-This module requires `libtreesitter.so` installed in a location where
-it can be dynamically linked. See the "libtreesitter"
+This module requires tree-sitter to be built as a shared object
+(`libtreesitter.so`) and placed in a location where it can be
+dynamically linked. See the "libtreesitter"
 [README](utils/libtreesitter/README.md) for instructions on building
-the tree-sitter runtime shared object.
+the tree-sitter runtime as a shared object.
 
 Once you have built the shared object place it somewhere it can be
 dynamically linked on your system (such as `/usr/lib/` or similar).
