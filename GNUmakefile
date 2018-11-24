@@ -29,8 +29,8 @@ tree-sitter-module.so: $(sources:.c=.o) externals/tree-sitter/libruntime.o
 
 # Build step derived from tree-sitter's "build-runtime" script.
 externals/tree-sitter/libruntime.o: externals/tree-sitter/externals/utf8proc/utf8proc.c \
-	$(wildcard externals/tree-sitter/src/runtime/*.c) \
-	$(wildcard externals/tree-sitter/include/tree_sitter/*)
+  $(wildcard externals/tree-sitter/src/runtime/*.c) \
+  $(wildcard externals/tree-sitter/include/tree_sitter/*)
 	$(CC) -c -fPIC -O3 -std=c99 -Iexternals/tree-sitter/src \
 	      -Iexternals/tree-sitter/include \
 	      -Iexternals/tree-sitter/externals/utf8proc \
