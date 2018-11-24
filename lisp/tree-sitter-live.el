@@ -32,13 +32,14 @@
 (require 'tree-sitter-defs)
 (require 'tree-sitter-module)
 
-(defvar tree-sitter-live-idle-time 0.25
-  "Idle time before re-parsing buffers with tree-sitter.")
-(defvar tree-sitter-live--idle-timer nil
-  "Idle timer for tree-sitter-live.")
-(defvar tree-sitter-live--pending-buffers nil
-  "List of buffers which need to be re-parsed at next idle interval.")
-(defvar tree-sitter-live-after-parse-functions nil
+(defgroup tree-sitter-live nil
+  "Options controlling live parsing of buffers with tree-sitter.")
+
+(defcustom tree-sitter-live-idle-time 0.25
+  "Idle time in seconds before re-parsing buffers with tree-sitter."
+  :type 'float
+  :group 'tree-sitter-live)
+(defcustom tree-sitter-live-after-parse-functions nil
   "Functions to call after a buffer is re-parsed with tree-sitter.
 The affected buffer is current while this hook is running.
 Functions are called with one argument: the old tree from before
@@ -46,11 +47,19 @@ the most recent re-parse. The current tree is stored in the
 variable `tree-sitter-live-tree'.
 
 Note that after the initial parse of the buffer, the old tree
-value provided to these functions will be nil.")
+value provided to these functions will be nil."
+  :type 'hook
+  :group 'tree-sitter-live)
+
 (defvar tree-sitter-live-auto-alist nil
   "Alist specifying tree-sitter languages by major mode symbols.
 Each entry is a pair of (MODE . LANG) where MODE is a major-mode
 symbol and LANG is a tree-sitter language")
+
+(defvar tree-sitter-live--idle-timer nil
+  "Idle timer for tree-sitter-live.")
+(defvar tree-sitter-live--pending-buffers nil
+  "List of buffers which need to be re-parsed at next idle interval.")
 
 (defvar-local tree-sitter-live--parser nil
   "Tree-sitter parser used to parse this buffer.")
