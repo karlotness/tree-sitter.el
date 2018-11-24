@@ -30,7 +30,7 @@
 - [X] ts_tree_print_dot_graph
   - Not implementing. Requires specifying a ~FILE *~ pointer.
 - [ ] ts_tree_language
-*** Node [93%]
+*** Node [100%]
 - [X] ts_node_start_byte
 - [X] ts_node_start_point
 - [X] ts_node_end_byte
@@ -60,8 +60,8 @@
 - [X] ts_node_first_named_child_for_byte
 - [X] ts_node_descendant_for_byte_range
 - [X] ts_node_named_descendant_for_byte_range
-- [ ] ts_node_descendant_for_point_range
-- [ ] ts_node_named_descendant_for_point_range
+- [X] ts_node_descendant_for_point_range
+- [X] ts_node_named_descendant_for_point_range
 - [X] ts_node_edit
 *** Tree Cursor [0%]
 - [ ] ts_tree_cursor_new

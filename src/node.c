@@ -353,6 +353,35 @@ static emacs_value tsel_node_descendant_for_byte_range(emacs_env *env,
   return tsel_node_emacs_move(env, child, node->tree);
 }
 
+static const char *tsel_node_descendant_for_point_range_doc = "Return descendant of NODE for point range START to END.\n"
+  "If TYPE is nil, t, or unspecified include all siblings. Otherwise, if\n"
+  "TYPE is the symbol 'named include only named siblings.\n"
+  "The behavior of other values for TYPE is unspecified and may change.\n"
+  "\n"
+  "(fn NODE START END &optional TYPE)";
+static emacs_value tsel_node_descendant_for_point_range(emacs_env *env,
+                                                        ptrdiff_t nargs,
+                                                        emacs_value *args,
+                                                        __attribute__((unused)) void *data) {
+  TSElNode *node;
+  TSPoint point_start, point_end;
+  TSEL_SUBR_EXTRACT(node, env, args[0], &node);
+  TSEL_SUBR_EXTRACT(point, env, args[1], &point_start);
+  TSEL_SUBR_EXTRACT(point, env, args[2], &point_end);
+  bool count_named = nargs > 3 && tsel_named_nodes(env, args[3]);
+  if(tsel_pending_nonlocal_exit(env)) {
+    return tsel_Qnil;
+  }
+  TSNode child;
+  if(count_named) {
+    child = ts_node_named_descendant_for_point_range(node->node, point_start, point_end);
+  }
+  else {
+    child = ts_node_descendant_for_point_range(node->node, point_start, point_end);
+  }
+  return tsel_node_emacs_move(env, child, node->tree);
+}
+
 static const char *tsel_node_edit_doc = "Mark NODE as edited.\n"
   "\n"
   "(fn NODE START-BYTE OLD-END-BYTE NEW-END-BYTE START-POINT OLD-END-POINT NEW-END-POINT)";
@@ -436,6 +465,9 @@ bool tsel_node_init(emacs_env *env) {
   function_result &= tsel_define_function(env, "tree-sitter-node-descendant-for-byte-range",
                                           &tsel_node_descendant_for_byte_range, 3, 4,
                                           tsel_node_descendant_for_byte_range_doc, NULL);
+  function_result &= tsel_define_function(env, "tree-sitter-node-descendant-for-point-range",
+                                          &tsel_node_descendant_for_point_range, 3, 4,
+                                          tsel_node_descendant_for_point_range_doc, NULL);
   function_result &= tsel_define_function(env, "tree-sitter-node-edit",
                                           &tsel_node_edit, 7, 7,
                                           tsel_node_edit_doc, NULL);
