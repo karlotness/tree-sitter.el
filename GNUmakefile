@@ -17,7 +17,6 @@
 # <https://www.gnu.org/licenses/>.
 CC?=gcc
 CFLAGS+=-std=c99 -O2 -Wall -Wextra -Wpedantic
-LDFLAGS+=-ltreesitter
 
 sources=$(wildcard src/*.c)
 
@@ -25,8 +24,18 @@ all: tree-sitter-module.so
 
 include $(sources:.c=.d)
 
-tree-sitter-module.so: $(sources:.c=.o)
-	$(CC) -shared -fPIC $(LDFLAGS) -o $@ $^
+tree-sitter-module.so: $(sources:.c=.o) externals/tree-sitter/libruntime.o
+	$(CC) -shared -fPIC -o $@ $^
+
+# Build step derived from tree-sitter's "build-runtime" script.
+externals/tree-sitter/libruntime.o: externals/tree-sitter/externals/utf8proc/utf8proc.c \
+	$(wildcard externals/tree-sitter/src/runtime/*.c) \
+	$(wildcard externals/tree-sitter/include/tree_sitter/*)
+	$(CC) -c -fPIC -O3 -std=c99 -Iexternals/tree-sitter/src \
+	      -Iexternals/tree-sitter/include \
+	      -Iexternals/tree-sitter/externals/utf8proc \
+	      externals/tree-sitter/src/runtime/runtime.c \
+	      -o $@
 
 %.o: %.c
 	$(CC) $(CFLAGS) -fPIC -c -o $@ $<
@@ -41,5 +50,6 @@ tree-sitter-module.so: $(sources:.c=.o)
 clean:
 	rm -f src/*.o src/*.d src/*.d.*
 	rm -f tree-sitter-module.so
+	rm -f externals/tree-sitter/libruntime.o
 
 .PHONY: clean
