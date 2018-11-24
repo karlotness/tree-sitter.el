@@ -22,7 +22,7 @@
 #define TSEL_POINT_H
 #include <stdbool.h>
 #include <emacs-module.h>
-#include <tree_sitter/runtime.h>
+#include "tree_sitter/runtime.h"
 
 bool tsel_point_init(emacs_env *env);
 bool tsel_point_p(emacs_env *env, emacs_value obj);

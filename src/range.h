@@ -22,7 +22,7 @@
 #define TSEL_RANGE_H
 #include <stdbool.h>
 #include <emacs-module.h>
-#include <tree_sitter/runtime.h>
+#include "tree_sitter/runtime.h"
 
 bool tsel_range_init(emacs_env *env);
 bool tsel_range_p(emacs_env *env, emacs_value obj);

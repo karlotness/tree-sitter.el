@@ -16,7 +16,7 @@
 # along with tree-sitter.el. If not, see
 # <https://www.gnu.org/licenses/>.
 CC?=gcc
-CFLAGS+=-std=c99 -O2 -Wall -Wextra -Wpedantic
+CFLAGS+=-std=c99 -O2 -Wall -Wextra -Wpedantic -Iexternals/tree-sitter/include
 
 sources=$(wildcard src/*.c)
 

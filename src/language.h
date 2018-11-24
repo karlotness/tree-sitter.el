@@ -22,7 +22,7 @@
 #define TSEL_LANGUAGE_H
 #include <stdbool.h>
 #include <emacs-module.h>
-#include <tree_sitter/runtime.h>
+#include "tree_sitter/runtime.h"
 
 typedef struct TSElLanguage {
   // Tag to check type, must be "TSLanguage" followed by null char.

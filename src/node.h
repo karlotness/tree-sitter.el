@@ -22,7 +22,7 @@
 #define TSEL_NODE_H
 #include <stdbool.h>
 #include <emacs-module.h>
-#include <tree_sitter/runtime.h>
+#include "tree_sitter/runtime.h"
 #include "tree.h"
 
 typedef struct TSElNode {
