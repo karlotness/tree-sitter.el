@@ -98,13 +98,22 @@ symbol and LANG is a tree-sitter language")
         (run-hook-with-args 'tree-sitter-live-after-parse-functions old-tree)))))
   (setq tree-sitter-live--pending-buffers nil))
 
+(defun tree-sitter-live--auto-language ()
+  (catch 'tree-sitter-live--auto-language
+    (dolist (lp tree-sitter-live-auto-alist)
+      (let ((mode (car lp))
+            (lang (cdr lp)))
+        (when (derived-mode-p mode)
+          (throw 'tree-sitter-live--auto-language lang))))
+    nil))
+
 (defun tree-sitter-live-setup (&optional language)
   "Enable tree-sitter-live for LANGUAGE in current buffer.
 LANGUAGE must be a tree-sitter-language record. If LANGUAGE is
 unspecified consult `tree-sitter-live-auto-alist' for the
 language to use based on `major-mode'."
   (setq tree-sitter-live--parser (tree-sitter-parser-new))
-  (let ((language (or language (cdr (assq major-mode tree-sitter-live-auto-alist)))))
+  (let ((language (or language (tree-sitter-live--auto-language))))
     (unless language
       (error "Language unspecified for tree-sitter-live"))
     (tree-sitter-parser-set-language tree-sitter-live--parser language))
