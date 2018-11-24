@@ -26,7 +26,7 @@ all: tree-sitter-module.so
 include $(sources:.c=.d)
 
 tree-sitter-module.so: $(sources:.c=.o)
-	$(CC) -shared $(LDFLAGS) -o $@ $^
+	$(CC) -shared -fPIC $(LDFLAGS) -o $@ $^
 
 %.o: %.c
 	$(CC) $(CFLAGS) -fPIC -c -o $@ $<
