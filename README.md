@@ -68,6 +68,11 @@ basic introduction to using tree-sitter see the project
 [documentation][3].
 
 ## License
+Note that the license, as described below, applies only to the code
+contained directly within this repository. Code contained within
+submodules, such as those under `externals/` is licensed separately.
+Check the license of these other files before using them.
+
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or (at
