@@ -3,6 +3,8 @@
 *.so
 *.d
 *.d.*
+version.mk
+*tar.gz
 
 # Emacs backup files
 *~

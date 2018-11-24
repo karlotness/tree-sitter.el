@@ -20,9 +20,14 @@ CFLAGS+=-std=c99 -O2 -Wall -Wextra -Wpedantic
 
 sources=$(wildcard src/*.c)
 
+include version.mk
+
 all: tree-sitter-module.so
 
 include $(sources:.c=.d)
+
+version.mk: lisp/tree-sitter-pkg.el
+	sed -n 's/(define-package ".*" "\([0-9\.]*\)"/VERSION=\1/p' lisp/tree-sitter-pkg.el > version.mk
 
 tree-sitter-module.so: $(sources:.c=.o) externals/tree-sitter/libruntime.o
 	$(CC) -shared -fPIC -o $@ $^
@@ -36,6 +41,14 @@ externals/tree-sitter/libruntime.o: externals/tree-sitter/externals/utf8proc/utf
 	      -Iexternals/tree-sitter/externals/utf8proc \
 	      externals/tree-sitter/src/runtime/runtime.c \
 	      -o $@
+
+dist: tree-sitter-$(VERSION).tar.gz
+
+tree-sitter-%.tar.gz: tree-sitter-module.so $(wildcard lisp/*.el)
+	mkdir "tree-sitter-$(VERSION)"
+	cp $^ "tree-sitter-$(VERSION)"
+	tar -czf $@ "tree-sitter-$(VERSION)"
+	rm -r "tree-sitter-$(VERSION)"
 
 %.o: %.c
 	$(CC) $(CFLAGS) -fPIC -c -o $@ $<
@@ -51,5 +64,6 @@ clean:
 	rm -f src/*.o src/*.d src/*.d.*
 	rm -f tree-sitter-module.so
 	rm -f externals/tree-sitter/libruntime.o
+	rm -f version.mk $(wildcard tree-sitter-*.tar.gz) $(wildcard tree-sitter-*.tar)
 
-.PHONY: clean
+.PHONY: clean dist
