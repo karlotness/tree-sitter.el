@@ -67,6 +67,6 @@ clean:
 	rm -f src/*.o src/*.d src/*.d.*
 	rm -f tree-sitter-module.so
 	rm -f externals/tree-sitter/libruntime.o
-	rm -f version.mk $(wildcard tree-sitter-*.tar.gz) $(wildcard tree-sitter-*.tar)
+	rm -f version.mk $(wildcard tree-sitter-*.tar.gz)
 
 .PHONY: clean dist submod
