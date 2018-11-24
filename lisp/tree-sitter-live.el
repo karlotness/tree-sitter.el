@@ -43,7 +43,10 @@
 The affected buffer is current while this hook is running.
 Functions are called with one argument: the old tree from before
 the most recent re-parse. The current tree is stored in the
-variable `tree-sitter-live-tree'.")
+variable `tree-sitter-live-tree'.
+
+Note that after the initial parse of the buffer, the old tree
+value provided to these functions will be nil.")
 (defvar tree-sitter-live-auto-alist nil
   "Alist specifying tree-sitter languages by major mode symbols.
 Each entry is a pair of (MODE . LANG) where MODE is a major-mode
@@ -108,6 +111,7 @@ language to use based on `major-mode'."
   (setq tree-sitter-live-tree
         (tree-sitter-parser-parse-buffer tree-sitter-live--parser
                                          (current-buffer)))
+  (run-hook-with-args 'tree-sitter-live-after-parse-functions nil)
   (setq tree-sitter-live--before-change (make-vector 4 0))
   (add-hook 'before-change-functions #'tree-sitter-live--before-change nil t)
   (add-hook 'after-change-functions #'tree-sitter-live--after-change nil t)
