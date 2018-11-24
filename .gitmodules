@@ -1,0 +1,4 @@
+[submodule "externals/tree-sitter"]
+	path = externals/tree-sitter
+	url = https://github.com/tree-sitter/tree-sitter.git
+        ignore = dirty
