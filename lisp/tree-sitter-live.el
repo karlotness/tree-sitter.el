@@ -55,7 +55,6 @@ value provided to these functions will be nil."
   "Alist specifying tree-sitter languages by major mode symbols.
 Each entry is a pair of (MODE . LANG) where MODE is a major-mode
 symbol and LANG is a tree-sitter language")
-
 (defvar tree-sitter-live--idle-timer nil
   "Idle timer for tree-sitter-live.")
 (defvar tree-sitter-live--pending-buffers nil
@@ -68,6 +67,33 @@ symbol and LANG is a tree-sitter language")
 ;; Store [start_byte old_end_byte start_point old_end_point]
 (defvar-local tree-sitter-live--before-change nil
   "Internal value for tracking old buffer locations")
+
+(define-minor-mode tree-sitter-live-mode
+  "Minor mode which parses a buffer during idle time with tree-sitter.
+
+The language to use is chosen based on `tree-sitter-live-auto-alist'."
+  :lighter ""
+  :group 'tree-sitter-live
+  (if tree-sitter-live-mode
+      ;; Enabling the mode
+      (let ((auto-lang (tree-sitter-live--auto-language)))
+        (if auto-lang
+            (tree-sitter-live--setup auto-lang)
+          (error "No tree-sitter language specified for mode %s" major-mode)))
+    ;; Disabling the mode
+    (tree-sitter-live--teardown)))
+
+
+(defun tree-sitter-live-mode-turn-on ()
+  "Maybe enable `tree-sitter-live-mode' for a buffer.
+Enable the mode if a language is defined for its major mode in
+`tree-sitter-live-auto-alist'."
+  (when (tree-sitter-live--auto-language)
+    (tree-sitter-live-mode)))
+
+(define-globalized-minor-mode global-tree-sitter-live-mode
+  tree-sitter-live-mode tree-sitter-live-mode-turn-on
+  :group 'tree-sitter-live)
 
 (defun tree-sitter-live--before-change (beg end)
   "Hook for `before-change-functions'."
@@ -116,20 +142,18 @@ symbol and LANG is a tree-sitter language")
           (throw 'tree-sitter-live--auto-language lang))))
     nil))
 
-(defun tree-sitter-live-setup (&optional language)
+(defun tree-sitter-live--setup (language)
   "Enable tree-sitter-live for LANGUAGE in current buffer.
-LANGUAGE must be a tree-sitter-language record. If LANGUAGE is
-unspecified consult `tree-sitter-live-auto-alist' for the
-language to use based on `major-mode'."
-  (setq tree-sitter-live--parser (tree-sitter-parser-new))
-  (let ((language (or language (tree-sitter-live--auto-language))))
-    (unless language
-      (error "Language unspecified for tree-sitter-live"))
-    (tree-sitter-parser-set-language tree-sitter-live--parser language))
-  (setq tree-sitter-live-tree
-        (tree-sitter-parser-parse-buffer tree-sitter-live--parser
-                                         (current-buffer)))
-  (run-hook-with-args 'tree-sitter-live-after-parse-functions nil)
+LANGUAGE must be a tree-sitter-language record."
+  (unless language
+    (error "Language unspecified for tree-sitter-live"))
+    (setq tree-sitter-live--parser (tree-sitter-parser-new))
+    (tree-sitter-parser-set-language tree-sitter-live--parser language)
+    (let ((old-tree tree-sitter-live-tree))
+      (setq tree-sitter-live-tree
+            (tree-sitter-parser-parse-buffer tree-sitter-live--parser
+                                             (current-buffer)))
+      (run-hook-with-args 'tree-sitter-live-after-parse-functions old-tree))
   (setq tree-sitter-live--before-change (make-vector 4 0))
   (add-hook 'before-change-functions #'tree-sitter-live--before-change nil t)
   (add-hook 'after-change-functions #'tree-sitter-live--after-change nil t)
@@ -138,6 +162,10 @@ language to use based on `major-mode'."
           (run-with-idle-timer tree-sitter-live-idle-time
                                t #'tree-sitter-live--idle-update)))
   nil)
+
+(defun tree-sitter-live--teardown ()
+  (remove-hook 'before-change-functions #'tree-sitter-live--before-change t)
+  (remove-hook 'after-change-functions #'tree-sitter-live--after-change t))
 
 (provide 'tree-sitter-live)
 ;;; tree-sitter-defs.el ends here
