@@ -35,9 +35,31 @@
 (defgroup tree-sitter-live nil
   "Options controlling live parsing of buffers with tree-sitter.")
 
+(defvar tree-sitter-live--idle-timer nil
+  "Idle timer for tree-sitter-live.")
+
+(defun tree-sitter-live--set-idle-time (symbol value)
+  (set-default symbol value)
+  (tree-sitter-live-reset-idle-timer))
+
+(defun tree-sitter-live-reset-idle-timer (&optional force)
+  "Re-create the idle timer used for `tree-sitter-live-mode'.
+If the timer does not exist and FORCE is nil, do nothing."
+  (when (or tree-sitter-live--idle-timer force)
+    (when tree-sitter-live--idle-timer
+      (cancel-timer tree-sitter-live--idle-timer))
+    (setq tree-sitter-live--idle-timer
+          (run-with-idle-timer tree-sitter-live-idle-time
+                               t #'tree-sitter-live--idle-update))))
+
 (defcustom tree-sitter-live-idle-time 0.25
-  "Idle time in seconds before re-parsing buffers with tree-sitter."
+  "Idle time in seconds before re-parsing buffers with tree-sitter.
+
+If you set this value outside customize call
+`tree-sitter-live-reset-idle-timer' with no arguments so that the
+value can take effect."
   :type 'float
+  :set 'tree-sitter-live--set-idle-time
   :group 'tree-sitter-live)
 (defcustom tree-sitter-live-after-parse-functions nil
   "Functions to call after a buffer is re-parsed with tree-sitter.
@@ -55,8 +77,6 @@ value provided to these functions will be nil."
   "Alist specifying tree-sitter languages by major mode symbols.
 Each entry is a pair of (MODE . LANG) where MODE is a major-mode
 symbol and LANG is a tree-sitter language")
-(defvar tree-sitter-live--idle-timer nil
-  "Idle timer for tree-sitter-live.")
 (defvar tree-sitter-live--pending-buffers nil
   "List of buffers which need to be re-parsed at next idle interval.")
 
@@ -158,9 +178,7 @@ LANGUAGE must be a tree-sitter-language record."
   (add-hook 'before-change-functions #'tree-sitter-live--before-change nil t)
   (add-hook 'after-change-functions #'tree-sitter-live--after-change nil t)
   (when (null tree-sitter-live--idle-timer)
-    (setq tree-sitter-live--idle-timer
-          (run-with-idle-timer tree-sitter-live-idle-time
-                               t #'tree-sitter-live--idle-update)))
+    (tree-sitter-live-reset-idle-timer t))
   nil)
 
 (defun tree-sitter-live--teardown ()
