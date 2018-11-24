@@ -60,10 +60,13 @@ tree-sitter-%.tar.gz: tree-sitter-module.so $(wildcard lisp/*.el)
 	sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@; \
 	rm -f $@.$$$$
 
+submod:
+	git submodule update --init --recursive
+
 clean:
 	rm -f src/*.o src/*.d src/*.d.*
 	rm -f tree-sitter-module.so
 	rm -f externals/tree-sitter/libruntime.o
 	rm -f version.mk $(wildcard tree-sitter-*.tar.gz) $(wildcard tree-sitter-*.tar)
 
-.PHONY: clean dist
+.PHONY: clean dist submod
