@@ -24,7 +24,7 @@ include version.mk
 
 all: dist
 
-include $(sources:.c=.d)
+-include $(sources:.c=.d)
 
 version.mk: lisp/tree-sitter-pkg.el
 	sed -n 's/(define-package ".*" "\([0-9\.]*\)"/VERSION=\1/p' lisp/tree-sitter-pkg.el > version.mk
@@ -56,7 +56,7 @@ tree-sitter-%.tar: tree-sitter-module.so $(wildcard lisp/*.el)
 # Rule taken from GNU Make manual
 %.d: %.c
 	@set -e; rm -f $@; \
-	$(CC) -M -MT $(<:.c=.o) $(CFLAGS) $< > $@.$$$$; \
+	$(CC) -M -MT $(<:.c=.o) $(CFLAGS) $< 2> /dev/null > $@.$$$$; \
 	sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@; \
 	rm -f $@.$$$$
 
