@@ -35,20 +35,23 @@ using `package-install-file`.
 ### Language grammar
 To make any real use of the module you will also need a language
 grammar for tree-sitter. Several of these are provided by tree-sitter
-and are listed under its [project page][2]. Instructions for producing
-Emacs dynamic modules for the *language* bindings can be found in the
-"language" [README](utils/language/README.md).
+and are listed under its [project page][2]. A few of these have
+packages under the `langs/` directory in this repository. To build one
+of these, change to the directory of that language and run
+```sh
+make submod
+make dist
+```
+Just like for the binding package, the first step will initialize the
+submodules, and the second will produce a tar file with the package.
+Install that with `package-install-file` in Emacs.
 
-Once you have built the module for your language, place the shared
-object and the `.el` lisp support file(s) somewhere on your Emacs
-`load-path`.
+**Note:** you will first need to run `make submod` at the root of this
+repository so that the tree-sitter headers are available.
 
-### Building tree-sitter.el
-With the dependencies installed, you can now build tree-sitter.el
-itself. To do that, run `make` which should produce
-`tree-sitter-module.so`. Place this file and the contents of the
-`lisp/` directory on your Emacs `load-path`. It may be easier just to
-add the root of this repository and `lisp/` to your `load-path`.
+To package other language grammars you might re-purpose the file for
+one of these languages to build against a different tree-sitter
+grammar.
 
 ## Usage
 Once you have the module installed you can load it by requiring
