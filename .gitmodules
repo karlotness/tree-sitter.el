@@ -2,3 +2,7 @@
 	path = externals/tree-sitter
 	url = https://github.com/tree-sitter/tree-sitter.git
         ignore = dirty
+[submodule "langs/python/externals/tree-sitter-python"]
+	path = langs/python/externals/tree-sitter-python
+	url = https://github.com/tree-sitter/tree-sitter-python.git
+        ignore = dirty
