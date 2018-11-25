@@ -22,7 +22,7 @@ sources=$(wildcard src/*.c)
 
 include version.mk
 
-all: tree-sitter-module.so
+all: dist
 
 include $(sources:.c=.d)
 
