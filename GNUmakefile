@@ -27,7 +27,7 @@ all: dist
 -include $(sources:.c=.d)
 
 version.mk: lisp/tree-sitter-pkg.el
-	sed -n 's/(define-package ".*" "\([0-9\.]*\)"/VERSION=\1/p' lisp/tree-sitter-pkg.el > version.mk
+	@sed -n 's/(define-package ".*" "\([0-9\.]*\)"/VERSION=\1/p' lisp/tree-sitter-pkg.el > version.mk
 
 tree-sitter-module.so: $(sources:.c=.o) externals/tree-sitter/libruntime.o
 	$(CC) -shared -fPIC -o $@ $^
