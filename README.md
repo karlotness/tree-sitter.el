@@ -65,6 +65,15 @@ counterparts, prefixed with `tree-sitter` rather than `ts`. For a
 basic introduction to using tree-sitter see the project
 [documentation][3].
 
+You can also configure live parsing by first adding your language
+grammar to `tree-sitter-live-auto-alist` and then enabling
+`global-tree-sitter-live-mode`. For example:
+```elisp
+(setq tree-sitter-live-auto-alist
+      '((python-mode . tree-sitter-lang-python)))
+(global-tree-sitter-live-mode t)
+```
+
 ## License
 Note that the license, as described below, applies only to the code
 contained directly within this repository. Code contained within
