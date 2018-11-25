@@ -182,6 +182,8 @@ value provided to these functions will be nil."
 
 
 ;; Minor modes
+
+;;;###autoload
 (define-minor-mode tree-sitter-live-mode
   "Minor mode which parses a buffer during idle time with tree-sitter.
 
@@ -197,6 +199,7 @@ The language to use is chosen based on `tree-sitter-live-auto-alist'."
     ;; Disabling the mode
     (tree-sitter-live--teardown)))
 
+;;;###autoload
 (define-globalized-minor-mode global-tree-sitter-live-mode
   tree-sitter-live-mode tree-sitter-live-mode-turn-on
   :group 'tree-sitter-live)
