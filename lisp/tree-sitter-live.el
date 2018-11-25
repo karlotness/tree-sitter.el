@@ -38,12 +38,6 @@
 (defvar tree-sitter-live--idle-timer nil
   "Idle timer for tree-sitter-live.")
 
-(defvar tree-sitter-live-auto-alist nil
-  "Alist specifying tree-sitter languages by major mode symbols.
-Each entry is a pair of (MODE . LANG) where MODE is a major-mode
-symbol and LANG is function which, when called with no arguments,
-returns a tree-sitter language")
-
 (defvar tree-sitter-live--pending-buffers nil
   "List of buffers which need to be re-parsed at next idle interval.")
 
@@ -178,6 +172,14 @@ variable `tree-sitter-live-tree'.
 Note that after the initial parse of the buffer, the old tree
 value provided to these functions will be nil."
   :type 'hook
+  :group 'tree-sitter-live)
+
+(defcustom tree-sitter-live-auto-alist nil
+  "Alist specifying tree-sitter languages by major mode symbols.
+Each entry is a pair of (MODE . LANG) where MODE is a major-mode
+symbol and LANG is function which, when called with no arguments,
+returns a tree-sitter language"
+  :type '(alist :key-type symbol :value-type function)
   :group 'tree-sitter-live)
 
 
