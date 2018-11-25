@@ -41,7 +41,8 @@
 (defvar tree-sitter-live-auto-alist nil
   "Alist specifying tree-sitter languages by major mode symbols.
 Each entry is a pair of (MODE . LANG) where MODE is a major-mode
-symbol and LANG is a tree-sitter language")
+symbol and LANG is function which, when called with no arguments,
+returns a tree-sitter language")
 
 (defvar tree-sitter-live--pending-buffers nil
   "List of buffers which need to be re-parsed at next idle interval.")
@@ -117,7 +118,7 @@ If the timer does not exist and FORCE is nil, do nothing."
       (let ((mode (car lp))
             (lang (cdr lp)))
         (when (derived-mode-p mode)
-          (throw 'tree-sitter-live--auto-language lang))))
+          (throw 'tree-sitter-live--auto-language (funcall lang)))))
     nil))
 
 (defun tree-sitter-live--setup (language)
