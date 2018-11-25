@@ -21,21 +21,16 @@ ideally the names will be compacted and the interface cleaned up in
 the future.
 
 ## Installation
-The installation is currently involved, particularly because this
-module depends the tree-sitter runtime and will also require a native
-module for parsing each language.
-
-### Libtreesitter
-This module requires tree-sitter to be built as a shared object
-(`libtreesitter.so`) and placed in a location where it can be
-dynamically linked. See the "libtreesitter"
-[README](utils/libtreesitter/README.md) for instructions on building
-the tree-sitter runtime as a shared object.
-
-Once you have built the shared object place it somewhere it can be
-dynamically linked on your system (such as `/usr/lib/` or similar).
-You may want to package the shared object file and install it with
-your package manager.
+Building the package requires a few external dependencies. These are
+included in this repository as Git submodules. To build, first clone
+the repository and change to the root directory. Then run
+```sh
+make submod
+make dist
+```
+The first step will recursively initialize the submodules and the
+second will produce a tar file with the package. Install that in Emacs
+using `package-install-file`.
 
 ### Language grammar
 To make any real use of the module you will also need a language
