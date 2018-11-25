@@ -30,6 +30,6 @@ clean:
 	rm -f $(sources_c:.c=.o) tree-sitter-lang-c-module.so
 
 submod:
-	git submodule update --init --recursive externals/
+	git submodule update --init externals/tree-sitter-c
 
 .PHONY: clean submod dist

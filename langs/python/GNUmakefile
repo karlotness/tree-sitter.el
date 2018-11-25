@@ -35,6 +35,6 @@ clean:
 	rm -f $(sources_c:.c=.o) $(sources_cc:.cc=.o) tree-sitter-lang-python-module.so
 
 submod:
-	git submodule update --init --recursive externals/
+	git submodule update --init externals/tree-sitter-python
 
 .PHONY: clean submod dist

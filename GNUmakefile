@@ -61,7 +61,8 @@ tree-sitter-%.tar: tree-sitter-module.so $(wildcard lisp/*.el)
 	rm -f $@.$$$$
 
 submod:
-	git submodule update --init --recursive externals/
+	git submodule update --init externals/tree-sitter
+	cd externals/tree-sitter && git submodule update --init externals/utf8proc
 
 clean:
 	rm -f src/*.o src/*.d src/*.d.*
