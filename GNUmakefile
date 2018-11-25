@@ -45,10 +45,10 @@ externals/tree-sitter/libruntime.o: externals/tree-sitter/externals/utf8proc/utf
 dist: tree-sitter-$(VERSION).tar
 
 tree-sitter-%.tar: tree-sitter-module.so $(wildcard lisp/*.el)
-	mkdir "tree-sitter-$(VERSION)"
-	cp $^ "tree-sitter-$(VERSION)"
-	tar -cf $@ "tree-sitter-$(VERSION)"
-	rm -r "tree-sitter-$(VERSION)"
+	mkdir "tree-sitter-$*"
+	cp $^ "tree-sitter-$*"
+	tar -cf $@ "tree-sitter-$*"
+	rm -r "tree-sitter-$*"
 
 %.o: %.c
 	$(CC) $(CFLAGS) -fPIC -c -o $@ $<
