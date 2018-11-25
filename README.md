@@ -1,9 +1,7 @@
 # tree-sitter.el
 An Emacs dynamic module exposing [tree-sitter][1].
 
-The build requires the `emacs-module.h` header in a system location.
-The installation process for Emacs 26 and above will correctly place
-the module header, otherwise it will need to be added manually.
+This package requires Emacs 26 or above.
 
 ## Status
 A list of functions and information on whether they have been exposed
