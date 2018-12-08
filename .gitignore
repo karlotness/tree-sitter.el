@@ -8,3 +8,6 @@ version.mk
 
 # Emacs backup files
 *~
+
+# Private editor settings
+.dir-locals-2.el
