@@ -1,6 +1,6 @@
 #include <string.h>
 #include <stdbool.h>
-#include "tree_sitter/runtime.h"
+#include "tree_sitter/api.h"
 #include <emacs-module.h>
 
 int plugin_is_GPL_compatible;
