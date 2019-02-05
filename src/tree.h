@@ -22,7 +22,7 @@
 #define TSEL_TREE_H
 #include <stdbool.h>
 #include <emacs-module.h>
-#include "tree_sitter/runtime.h"
+#include "tree_sitter/api.h"
 
 typedef struct TSElTree {
   uintptr_t refcount;

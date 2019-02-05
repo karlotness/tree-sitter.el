@@ -22,7 +22,7 @@
 #define TSEL_PARSER_H
 #include <stdbool.h>
 #include <emacs-module.h>
-#include "tree_sitter/runtime.h"
+#include "tree_sitter/api.h"
 #include "language.h"
 
 typedef struct TSElParser {

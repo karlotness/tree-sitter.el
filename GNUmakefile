@@ -16,7 +16,7 @@
 # along with tree-sitter.el. If not, see
 # <https://www.gnu.org/licenses/>.
 CC?=gcc
-CFLAGS+=-std=c99 -O2 -Wall -Wextra -Wpedantic -Iexternals/tree-sitter/include \
+CFLAGS+=-std=c99 -O2 -Wall -Wextra -Wpedantic -Iexternals/tree-sitter/lib/include \
   -Iincludes/
 
 sources=$(wildcard src/*.c)
@@ -30,17 +30,19 @@ all: dist
 version.mk: lisp/tree-sitter-pkg.el
 	@sed -n 's/(define-package ".*" "\([0-9\.]*\)"/VERSION=\1/p' lisp/tree-sitter-pkg.el > version.mk
 
-tree-sitter-module.so: $(sources:.c=.o) externals/tree-sitter/libruntime.o
+tree-sitter-module.so: $(sources:.c=.o) externals/tree-sitter/libtree-sitter.o
 	$(CC) -shared -fPIC -o $@ $^
 
-# Build step derived from tree-sitter's "build-runtime" script.
-externals/tree-sitter/libruntime.o: externals/tree-sitter/externals/utf8proc/utf8proc.c \
-  $(wildcard externals/tree-sitter/src/runtime/*.c) \
-  $(wildcard externals/tree-sitter/include/tree_sitter/*)
-	$(CC) -c -fPIC -O3 -std=c99 -Iexternals/tree-sitter/src \
-	      -Iexternals/tree-sitter/include \
-	      -Iexternals/tree-sitter/externals/utf8proc \
-	      externals/tree-sitter/src/runtime/runtime.c \
+# Build step derived from tree-sitter's "build-lib" script.
+externals/tree-sitter/libtree-sitter.o: externals/tree-sitter/lib/utf8proc/utf8proc.c \
+  externals/tree-sitter/lib/utf8proc/utf8proc.h \
+  $(wildcard externals/tree-sitter/lib/src/*.c) \
+  $(wildcard externals/tree-sitter/lib/include/tree_sitter/*)
+	$(CC) -c -fPIC -O3 -std=c99 -Iexternals/tree-sitter/lib/src \
+	      -Iexternals/tree-sitter/lib/include \
+	      -Iexternals/tree-sitter/lib/utf8proc \
+	      externals/tree-sitter/lib/src/lib.c \
+	      -D_POSIX_C_SOURCE \
 	      -o $@
 
 dist: tree-sitter-$(VERSION).tar
@@ -63,12 +65,12 @@ tree-sitter-%.tar: tree-sitter-module.so $(wildcard lisp/*.el)
 
 submod:
 	git submodule update --init externals/tree-sitter
-	cd externals/tree-sitter && git submodule update --init externals/utf8proc
+	cd externals/tree-sitter && git submodule update --init lib/utf8proc
 
 clean:
 	rm -f src/*.o src/*.d src/*.d.*
 	rm -f tree-sitter-module.so
-	rm -f externals/tree-sitter/libruntime.o
+	rm -f externals/tree-sitter/libtree-sitter.o
 	rm -f version.mk $(wildcard tree-sitter-*.tar.gz)
 
 .PHONY: clean dist submod
