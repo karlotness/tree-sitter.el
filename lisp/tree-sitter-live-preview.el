@@ -47,8 +47,13 @@
     (error "Source buffer is dead")))
 
 (defun tree-sitter-live-preview--format (node)
-  (let ((name (tree-sitter-node-type node)))
-    name))
+  (let* ((name (tree-sitter-node-type node))
+         (start-byte (tree-sitter-node-start-byte node))
+         (end-byte (tree-sitter-node-end-byte node))
+         (start (byte-to-position start-byte))
+         (end (byte-to-position end-byte))
+         (text (tree-sitter-live-preview--shorten (buffer-substring start end))))
+    (format "%s [%s]" name text)))
 
 (defun tree-sitter-live-preview--node (node parent-markers)
   (let* ((name (tree-sitter-node-type node))
