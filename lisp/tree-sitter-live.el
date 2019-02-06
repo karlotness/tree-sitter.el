@@ -207,4 +207,4 @@ The language to use is chosen based on `tree-sitter-live-auto-alist'."
   :group 'tree-sitter-live)
 
 (provide 'tree-sitter-live)
-;;; tree-sitter-defs.el ends here
+;;; tree-sitter-live.el ends here
