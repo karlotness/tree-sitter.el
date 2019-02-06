@@ -76,6 +76,40 @@ grammar to `tree-sitter-live-auto-alist` and then enabling
 (global-tree-sitter-live-mode t)
 ```
 
+### Previewing Trees
+Once you have configured `tree-sitter-live-mode` as above, use command
+`M-x tree-sitter-live-preview` to produce a buffer with a preview of a
+live-parsed tree.
+
+For example the following Python code:
+```python
+def func(x):
+    # Comment
+    return 2 + 3
+```
+will produce preview output:
+```
+module [def func(x):...eturn 2 + 3 ]
+  └ function_definition [def func(x):...return 2 + 3]
+    ├ def [def]
+    ├ identifier [func]
+    ├ parameters [(x)]
+    │ ├ ( [(]
+    │ ├ identifier [x]
+    │ └ ) [)]
+    ├ : [:]
+    ├ comment [# Comment]
+    └ return_statement [return 2 + 3]
+      ├ return [return]
+      └ expression_list [2 + 3]
+        └ binary_operator [2 + 3]
+          ├ integer [2]
+          ├ + [+]
+          └ integer [3]
+```
+The text in square brackets is an excerpt of the source range covered
+by a particular tree node.
+
 ## License
 Note that the license, as described below, applies only to the code
 contained directly within this repository. Code contained within
