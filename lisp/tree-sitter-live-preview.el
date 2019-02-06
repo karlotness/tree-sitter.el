@@ -66,7 +66,8 @@ buffer."
     (with-current-buffer tree-buf
       (erase-buffer))
     (tree-sitter-live-preview--node
-     (tree-sitter-tree-root-node tree-sitter-live-tree) nil)))
+     (tree-sitter-tree-root-node tree-sitter-live-tree) nil)
+    (display-buffer tree-buf)))
 
 (provide 'tree-sitter-live-preview)
 ;;; tree-sitter-live-preview.el ends here
