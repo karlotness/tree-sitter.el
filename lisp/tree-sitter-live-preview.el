@@ -61,10 +61,15 @@ buffer."
   (let ((tree-buf
          (or (when (buffer-live-p tree-sitter-live-preview--buffer)
                tree-sitter-live-preview--buffer)
-             (get-buffer-create (format "ts-tree: %s" (buffer-name))))))
+             (get-buffer-create (format "ts-tree: %s" (buffer-name)))))
+        (inhibit-read-only t))
     (setq tree-sitter-live-preview--buffer tree-buf)
-    (with-current-buffer tree-buf
-      (erase-buffer))
+    (let ((source (current-buffer)))
+      (with-current-buffer tree-buf
+        (erase-buffer)
+        (special-mode)
+        (read-only-mode 1)
+        (setq tree-sitter-live-preview--buffer source)))
     (tree-sitter-live-preview--node
      (tree-sitter-tree-root-node tree-sitter-live-tree) nil)
     (display-buffer tree-buf)))
