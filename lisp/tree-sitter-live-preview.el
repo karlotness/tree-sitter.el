@@ -88,6 +88,8 @@ buffer."
         (setq tree-sitter-live-preview--buffer source)))
     (tree-sitter-live-preview--node
      (tree-sitter-tree-root-node tree-sitter-live-tree) nil)
+    (with-current-buffer tree-buf
+      (goto-char (point-min)))
     (display-buffer tree-buf)))
 
 (provide 'tree-sitter-live-preview)
