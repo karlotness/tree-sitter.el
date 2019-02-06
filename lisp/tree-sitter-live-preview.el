@@ -52,15 +52,15 @@
 
 (defun tree-sitter-live-preview--node (node parent-markers)
   (let* ((name (tree-sitter-node-type node))
-        (next-sibling (tree-sitter-node-next-sibling node))
-        (next-child (tree-sitter-node-child node 0))
-        (prefix (mapconcat 'identity
-                           (nreverse (cons (cond ((not parent-markers) "")
-                                                 (next-sibling "├ ")
-                                                 (t "└ "))
-                                           (mapcar (lambda (b) (if b "│ " "  "))
-                                                   parent-markers)))
-                           "")))
+         (next-sibling (tree-sitter-node-next-sibling node))
+         (next-child (tree-sitter-node-child node 0))
+         (prefix (mapconcat 'identity
+                            (nreverse (cons (cond ((not parent-markers) "")
+                                                  (next-sibling "├ ")
+                                                  (t "└ "))
+                                            (mapcar (lambda (b) (if b "│ " "  "))
+                                                    parent-markers)))
+                            "")))
     (with-current-buffer tree-sitter-live-preview--buffer
       (insert prefix (tree-sitter-live-preview--format node) "\n"))
     (when next-child
