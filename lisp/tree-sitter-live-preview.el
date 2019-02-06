@@ -46,6 +46,10 @@
         (tree-sitter-live-preview))
     (error "Source buffer is dead")))
 
+(defun tree-sitter-live-preview--format (node)
+  (let ((name (tree-sitter-node-type node)))
+    name))
+
 (defun tree-sitter-live-preview--node (node parent-markers)
   (let* ((name (tree-sitter-node-type node))
         (next-sibling (tree-sitter-node-next-sibling node))
@@ -58,7 +62,7 @@
                                                    parent-markers)))
                            "")))
     (with-current-buffer tree-sitter-live-preview--buffer
-      (insert prefix name "\n"))
+      (insert prefix (tree-sitter-live-preview--format node) "\n"))
     (when next-child
       (tree-sitter-live-preview--node next-child (cons next-sibling parent-markers)))
     (when next-sibling
