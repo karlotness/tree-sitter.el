@@ -42,7 +42,6 @@ externals/tree-sitter/libtree-sitter.o: externals/tree-sitter/lib/utf8proc/utf8p
 	      -Iexternals/tree-sitter/lib/include \
 	      -Iexternals/tree-sitter/lib/utf8proc \
 	      externals/tree-sitter/lib/src/lib.c \
-	      -D_POSIX_C_SOURCE \
 	      -o $@
 
 dist: tree-sitter-$(VERSION).tar
