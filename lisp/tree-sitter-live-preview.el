@@ -31,6 +31,15 @@
 
 (defvar-local tree-sitter-live-preview--buffer nil)
 
+(defun tree-sitter-live-preview--shorten (text)
+  (let ((one-line (mapconcat (lambda (c) (if (eql ?\n c) " " (string c)))
+                             text "")))
+    (if (> (length one-line) 27)
+        (let ((start (substring one-line 0 12))
+              (end (substring one-line -12 nil)))
+          (format "%s...%s" start end))
+      one-line)))
+
 (defun tree-sitter-live-preview--node (node parent-markers)
   (let* ((name (tree-sitter-node-type node))
         (next-sibling (tree-sitter-node-next-sibling node))
