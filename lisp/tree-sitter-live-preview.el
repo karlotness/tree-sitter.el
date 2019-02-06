@@ -40,6 +40,12 @@
           (format "%s...%s" start end))
       one-line)))
 
+(defun tree-sitter-live-preview--revert (ignore-auto noconfirm)
+  (if (buffer-live-p tree-sitter-live-preview--buffer)
+      (with-current-buffer tree-sitter-live-preview--buffer
+        (tree-sitter-live-preview))
+    (error "Source buffer is dead")))
+
 (defun tree-sitter-live-preview--node (node parent-markers)
   (let* ((name (tree-sitter-node-type node))
         (next-sibling (tree-sitter-node-next-sibling node))
@@ -78,6 +84,7 @@ buffer."
         (erase-buffer)
         (special-mode)
         (read-only-mode 1)
+        (setq-local revert-buffer-function #'tree-sitter-live-preview--revert)
         (setq tree-sitter-live-preview--buffer source)))
     (tree-sitter-live-preview--node
      (tree-sitter-tree-root-node tree-sitter-live-tree) nil)
