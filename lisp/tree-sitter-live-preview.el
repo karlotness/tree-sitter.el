@@ -60,9 +60,10 @@
                                                   (t "└ "))
                                             (mapcar (lambda (b) (if b "│ " "  "))
                                                     parent-markers)))
-                            "")))
+                            ""))
+         (node-desc (tree-sitter-live-preview--format node)))
     (with-current-buffer tree-sitter-live-preview--buffer
-      (insert prefix (tree-sitter-live-preview--format node) "\n"))
+      (insert prefix node-desc "\n"))
     (when next-child
       (tree-sitter-live-preview--node next-child (cons next-sibling parent-markers)))
     (when next-sibling
