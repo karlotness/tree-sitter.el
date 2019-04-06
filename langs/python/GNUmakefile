@@ -1,7 +1,7 @@
 CC?=gcc
-CFLAGS+=-std=c99 -Isrc/ -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=1 -O2 -I../../externals/tree-sitter/lib/include \
+CFLAGS+=-std=c99 -Iexternals/tree-sitter-python/src/ -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=1 -O2 -I../../externals/tree-sitter/lib/include \
     -I../../includes/
-CXXFLAGS+=-Isrc/ -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=1 -O2 -I../../externals/tree-sitter/lib/include \
+CXXFLAGS+=-Iexternals/tree-sitter-python/src/ -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=1 -O2 -I../../externals/tree-sitter/lib/include \
     -I../../includes/
 LDFLAGS+=
 
