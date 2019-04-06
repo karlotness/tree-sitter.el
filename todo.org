@@ -2,7 +2,7 @@
 #+OPTIONS: ^:nil
 
 ** API Categories
-*** Parser [35%]
+*** Parser [33%]
 - [X] ts_parser_new
 - [X] ts_parser_delete
 - [X] ts_parser_language
@@ -14,13 +14,14 @@
 - [ ] ts_parser_halt_on_error
 - [X] ts_parser_parse
 - [ ] ts_parser_parse_string
-- [ ] ts_parser_enabled
-- [ ] ts_parser_set_enabled
-- [ ] ts_parser_operation_limit
-- [ ] ts_parser_set_operation_limit
+- [ ] ts_parser_parse_string_encoding
 - [ ] ts_parser_reset
 - [ ] ts_parser_set_included_ranges
 - [ ] ts_parser_included_ranges
+- [ ] ts_parser_set_timeout_micros
+- [ ] ts_parser_timeout_micros
+- [ ] ts_parser_set_cancellation_flag
+- [ ] ts_parser_cancellation_flag
 *** Tree [85%]
 - [X] ts_tree_copy
 - [X] ts_tree_delete
@@ -30,7 +31,7 @@
 - [X] ts_tree_print_dot_graph
   - Not implementing. Requires specifying a ~FILE *~ pointer.
 - [ ] ts_tree_language
-*** Node [100%]
+*** Node [93%]
 - [X] ts_node_start_byte
 - [X] ts_node_start_point
 - [X] ts_node_end_byte
@@ -63,6 +64,8 @@
 - [X] ts_node_descendant_for_point_range
 - [X] ts_node_named_descendant_for_point_range
 - [X] ts_node_edit
+- [ ] ts_node_child_by_field_name
+- [ ] ts_node_child_by_field_id
 *** Tree Cursor [0%]
 - [ ] ts_tree_cursor_new
 - [ ] ts_tree_cursor_delete
@@ -72,9 +75,14 @@
 - [ ] ts_tree_cursor_goto_next_sibling
 - [ ] ts_tree_cursor_goto_first_child
 - [ ] ts_tree_cursor_goto_first_child_for_byte
-*** Language [100%]
+- [ ] ts_tree_cursor_current_field_name
+- [ ] ts_tree_cursor_current_field_id
+*** Language [62%]
 - [X] ts_language_symbol_count
 - [X] ts_language_symbol_name
 - [X] ts_language_symbol_for_name
 - [X] ts_language_symbol_type
 - [X] ts_language_version
+- [ ] ts_language_field_count
+- [ ] ts_language_field_name_for_id
+- [ ] ts_language_field_id_for_name
