@@ -31,7 +31,7 @@
 - [X] ts_tree_print_dot_graph
   - Not implementing. Requires specifying a ~FILE *~ pointer.
 - [ ] ts_tree_language
-*** Node [93%]
+*** Node [90%]
 - [X] ts_node_start_byte
 - [X] ts_node_start_point
 - [X] ts_node_end_byte
@@ -46,6 +46,7 @@
   - Not implementing. Module converts null nodes to nil.
 - [X] ts_node_is_named
 - [X] ts_node_is_missing
+- [ ] ts_node_is_extra
 - [X] ts_node_has_changes
 - [X] ts_node_has_error
 - [X] ts_node_parent
@@ -77,6 +78,7 @@
 - [ ] ts_tree_cursor_goto_first_child_for_byte
 - [ ] ts_tree_cursor_current_field_name
 - [ ] ts_tree_cursor_current_field_id
+- [ ] ts_tree_cursor_copy
 *** Language [62%]
 - [X] ts_language_symbol_count
 - [X] ts_language_symbol_name
