@@ -1,6 +1,6 @@
 ;;; tree-sitter-live.el --- Live buffer parsing with tree-sitter  -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2018 Karl Otness
+;; Copyright (C) 2018, 2019 Karl Otness
 
 ;; This file is part of tree-sitter.el.
 

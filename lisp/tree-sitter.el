@@ -1,6 +1,6 @@
 ;;; tree-sitter.el --- Emacs bindings to the tree-sitter parser  -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2018 Karl Otness
+;; Copyright (C) 2018, 2019 Karl Otness
 
 ;; This file is part of tree-sitter.el.
 

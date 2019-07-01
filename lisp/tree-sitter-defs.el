@@ -1,6 +1,6 @@
 ;;; tree-sitter-defs.el --- Common definitions for tree-sitter.el  -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2018 Karl Otness
+;; Copyright (C) 2018, 2019 Karl Otness
 
 ;; This file is part of tree-sitter.el.
 
