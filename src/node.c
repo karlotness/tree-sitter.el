@@ -153,7 +153,7 @@ static emacs_value tsel_node_eq(emacs_env *env,
   return tsel_Qnil;
 }
 
-static bool (*tsel_node_predicates[4]) (TSNode) = {&ts_node_is_named, &ts_node_is_missing, &ts_node_has_changes, &ts_node_has_error};
+static bool (*tsel_node_predicates[5]) (TSNode) = {&ts_node_is_named, &ts_node_is_missing, &ts_node_has_changes, &ts_node_has_error, &ts_node_is_extra};
 
 static emacs_value tsel_node_predicate(emacs_env *env,
                                        __attribute__((unused)) ptrdiff_t nargs,
@@ -178,6 +178,9 @@ static const char *tsel_node_has_changes_doc = "Return non-nil if NODE has chang
   "\n"
   "(fn NODE)";
 static const char *tsel_node_has_error_doc = "Return non-nil if NODE has an error.\n"
+  "\n"
+  "(fn NODE)";
+static const char *tsel_node_is_extra_doc = "Return non-nil if NODE is extra.\n"
   "\n"
   "(fn NODE)";
 
@@ -444,6 +447,9 @@ bool tsel_node_init(emacs_env *env) {
   function_result &= tsel_define_function(env, "tree-sitter-node-has-error-p",
                                           &tsel_node_predicate, 1, 1,
                                           tsel_node_has_error_doc, &tsel_node_predicates[3]);
+  function_result &= tsel_define_function(env, "tree-sitter-node-extra-p",
+                                          &tsel_node_predicate, 1, 1,
+                                          tsel_node_is_extra_doc, &tsel_node_predicates[4]);
   function_result &= tsel_define_function(env, "tree-sitter-node-parent",
                                           &tsel_node_parent, 1, 1,
                                           tsel_node_parent_doc, NULL);
