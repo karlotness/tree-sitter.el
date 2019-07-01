@@ -34,6 +34,11 @@ Users should not call this function."
 Users should not call this function."
   (record 'tree-sitter-symbol code))
 
+(defun tree-sitter-field--create (code)
+    "Create a new tree-sitter-field record.
+Users should not call this function."
+    (record 'tree-sitter-field code))
+
 (defun tree-sitter-parser--create (ptr)
   "Create a new tree-sitter-parser record.
 Users should not call this function."
