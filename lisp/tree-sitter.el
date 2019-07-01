@@ -29,5 +29,41 @@
 (require 'tree-sitter-defs)
 (require 'tree-sitter-module)
 
+(defun tree-sitter-language-fields (lang)
+  "Retrieve fields in a tree sitter language.
+Returns a list of fields and their names for tree-sitter-language
+LANG. The list contains (NAME . FIELD) pairs where NAME is a
+string and FIELD is the tree-sitter-field record."
+  (let ((fields nil)
+        (count (tree-sitter-language-field-count lang)))
+    (dotimes (i count)
+      (let* ((id (1+ i))
+             (field (tree-sitter-field--create id))
+             (name (tree-sitter-language-field-name lang field)))
+        (push (cons name field) fields)))
+    (nreverse fields)))
+
+(defun tree-sitter-language-symbols (lang &optional type)
+    "Retrieve symbols for a tree sitter language.
+Returns a list of symbols and their names for
+tree-sitter-language LANG. The list contains (NAME . SYMBOL)
+pairs where NAME is a string and SYMBOL is the tree-sitter-field
+record.
+
+The optional argument TYPE allows filtering the list of symbols.
+When unspecified or nil all symbols will be included. When TYPE
+is another symbol only those symbols with a matching value under
+`tree-sitter-language-symbol-type' will be included."
+  (let ((symbols nil)
+        (count (tree-sitter-language-symbol-count lang)))
+    (dotimes (i count)
+      (let* ((id i)
+             (symbol (tree-sitter-symbol--create id))
+             (name (tree-sitter-language-symbol-name lang symbol)))
+        (when (or (not type) (eq type
+                                 (tree-sitter-language-symbol-type lang symbol)))
+          (push (cons name symbol) symbols))))
+    (nreverse symbols)))
+
 (provide 'tree-sitter)
 ;;; tree-sitter.el ends here
