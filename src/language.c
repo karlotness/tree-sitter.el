@@ -136,7 +136,7 @@ static emacs_value tsel_language_field_name(emacs_env *env,
   TSFieldId code;
   TSEL_SUBR_EXTRACT(language, env, args[0], &lang);
   TSEL_SUBR_EXTRACT(tsfieldid, env, args[1], &code);
-  if(code < ts_language_field_count(lang->ptr)) {
+  if(code < ts_language_field_count(lang->ptr) + 1) {
     const char *name = ts_language_field_name_for_id(lang->ptr, code);
     return env->make_string(env, name, strlen(name));
   }

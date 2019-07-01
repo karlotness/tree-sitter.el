@@ -51,7 +51,7 @@ bool tsel_field_p(emacs_env *env, emacs_value obj) {
   }
   // Ensure the code is non-negative
   intmax_t raw_code = env->extract_integer(env, code);
-  if(raw_code < 0 || tsel_pending_nonlocal_exit(env)){
+  if(raw_code <= 0 || tsel_pending_nonlocal_exit(env)){
     env->non_local_exit_clear(env);
     return false;
   }
