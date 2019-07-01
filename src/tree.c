@@ -125,6 +125,7 @@ static emacs_value tsel_tree_changed_ranges(emacs_env *env,
       return tsel_Qnil;
     }
   }
+  free(ptr);
   return list;
 }
 
