@@ -15,12 +15,9 @@ should not crash Emacs. The values returned by the module are also
 intended to be garbage collected by Emacs, so no manual memory
 management functions from tree-sitter will be directly exposed.
 
-The interface to the module is *not settled*. The binding code is in
-early stages and will need a fair bit of cleanup to fix
-inconsistencies and patch likely bugs. Function names and signatures
-may change in a later pass. The interface is currently verbose and
-ideally the names will be compacted and the interface cleaned up in
-the future.
+The interface to the module is not entirely settled. The bindings may
+need to change to make them integrate more naturally with Emacs or to
+fix bugs.
 
 ## Installation
 Building the package requires a few external dependencies. These are
