@@ -79,12 +79,12 @@
 - [ ] ts_tree_cursor_current_field_name
 - [ ] ts_tree_cursor_current_field_id
 - [ ] ts_tree_cursor_copy
-*** Language [62%]
+*** Language [100%]
 - [X] ts_language_symbol_count
 - [X] ts_language_symbol_name
 - [X] ts_language_symbol_for_name
 - [X] ts_language_symbol_type
 - [X] ts_language_version
-- [ ] ts_language_field_count
-- [ ] ts_language_field_name_for_id
-- [ ] ts_language_field_id_for_name
+- [X] ts_language_field_count
+- [X] ts_language_field_name_for_id
+- [X] ts_language_field_id_for_name

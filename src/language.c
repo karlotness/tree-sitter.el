@@ -21,6 +21,7 @@
 #include <stdlib.h>
 #include "language.h"
 #include "symbol.h"
+#include "field.h"
 #include "common.h"
 
 static const char *tsel_language_symbol_count_doc = "Count the number of symbols in LANG.\n"
@@ -108,6 +109,58 @@ static emacs_value tsel_language_symbol_type(emacs_env *env,
   return tsel_Qnil;
 }
 
+static const char *tsel_language_field_count_doc = "Count the number of field types in LANG.\n"
+  "LANG is a `tree-sitter-language-p' object.\n"
+  "\n"
+  "(fn LANG)";
+static emacs_value tsel_language_field_count(emacs_env *env,
+                                              __attribute__((unused)) ptrdiff_t nargs,
+                                              emacs_value *args,
+                                              __attribute__((unused)) void *data) {
+  TSElLanguage *ptr;
+  TSEL_SUBR_EXTRACT(language, env, args[0], &ptr);
+  uint32_t s_count = ts_language_field_count(ptr->ptr);
+  return env->make_integer(env, s_count);
+}
+
+static const char *tsel_language_field_name_doc = "Retrieve the name of FIELD under LANG.\n"
+  "LANG is a tree-sitter-language and FIELD is a tree-sitter-field.\n"
+  "Returns the field name as a string or nil, if it is not defined.\n"
+  "\n"
+  "(fn LANG FIELD)";
+static emacs_value tsel_language_field_name(emacs_env *env,
+                                             __attribute__((unused)) ptrdiff_t nargs,
+                                             emacs_value *args,
+                                             __attribute__((unused)) void *data) {
+  TSElLanguage *lang;
+  TSFieldId code;
+  TSEL_SUBR_EXTRACT(language, env, args[0], &lang);
+  TSEL_SUBR_EXTRACT(tsfieldid, env, args[1], &code);
+  if(code < ts_language_field_count(lang->ptr)) {
+    const char *name = ts_language_field_name_for_id(lang->ptr, code);
+    return env->make_string(env, name, strlen(name));
+  }
+  return tsel_Qnil;
+}
+
+static const char *tsel_language_field_for_name_doc = "Retrieve a field from LANG by its NAME.\n"
+  "LANG is a tree-sitter-language and NAME is a string naming a field.\n"
+  "Returns the field or nil if it was not found.\n"
+  "\n"
+  "(fn LANG NAME)";
+static emacs_value tsel_language_field_for_name(emacs_env *env,
+                                                 __attribute__((unused)) ptrdiff_t nargs,
+                                                 emacs_value *args,
+                                                 __attribute__((unused)) void *data) {
+  TSElLanguage *lang;
+  char *str;
+  TSEL_SUBR_EXTRACT(language, env, args[0], &lang);
+  TSEL_SUBR_EXTRACT(string, env, args[1], &str);
+  size_t name_length = strlen(str) + 1;
+  TSFieldId code = ts_language_field_id_for_name(lang->ptr, str, name_length);
+  return tsel_field_emacs_move(env, code);
+}
+
 static const char *tsel_language_version_doc = "Return the version of language LANG.\n"
   "\n"
   "(fn LANG)";
@@ -152,6 +205,15 @@ bool tsel_language_init(emacs_env *env) {
   function_result &= tsel_define_function(env, "tree-sitter-language-p",
                                           &tsel_language_p_wrapped, 1, 1,
                                           tsel_language_p_wrapped_doc, NULL);
+  function_result &= tsel_define_function(env, "tree-sitter-language-field-count",
+                                           &tsel_language_field_count, 1, 1,
+                                           tsel_language_field_count_doc, NULL);
+  function_result &= tsel_define_function(env, "tree-sitter-language-field-name",
+                                          &tsel_language_field_name, 2, 2,
+                                          tsel_language_field_name_doc, NULL);
+  function_result &= tsel_define_function(env, "tree-sitter-language-field-for-name",
+                                          &tsel_language_field_for_name, 2, 2,
+                                          tsel_language_field_for_name_doc, NULL);
   return function_result;
 }
 
