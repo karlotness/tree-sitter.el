@@ -78,6 +78,9 @@ bool tsel_extract_tsfieldid(emacs_env *env, emacs_value obj, TSFieldId *code_out
 }
 
 emacs_value tsel_field_emacs_move(emacs_env *env, TSFieldId code) {
+  if(code == 0) {
+    return tsel_Qnil;
+  }
   emacs_value ecode = env->make_integer(env, code);
   emacs_value Qts_symb_create = env->intern(env, "tree-sitter-field--create");
   emacs_value args[1] = { ecode };
