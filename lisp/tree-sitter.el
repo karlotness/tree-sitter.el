@@ -47,7 +47,7 @@ string and FIELD is the tree-sitter-field record."
     "Retrieve symbols for a tree sitter language.
 Returns a list of symbols and their names for
 tree-sitter-language LANG. The list contains (NAME . SYMBOL)
-pairs where NAME is a string and SYMBOL is the tree-sitter-field
+pairs where NAME is a string and SYMBOL is the tree-sitter-symbol
 record.
 
 The optional argument TYPE allows filtering the list of symbols.
