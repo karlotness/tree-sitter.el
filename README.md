@@ -57,6 +57,7 @@ Once you have the module installed you can load it by requiring
 `tree-sitter`. Also be sure to require your language.
 ```elisp
 (require 'tree-sitter)
+(require 'tree-sitter-live)
 (require 'tree-sitter-lang-python)
 ```
 The functions exposed follow the names of their tree-sitter C

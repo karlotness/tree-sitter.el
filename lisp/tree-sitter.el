@@ -28,7 +28,6 @@
 ;;; Code:
 (require 'tree-sitter-defs)
 (require 'tree-sitter-module)
-(require 'tree-sitter-live)
 
 (provide 'tree-sitter)
 ;;; tree-sitter.el ends here

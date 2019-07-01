@@ -30,8 +30,7 @@
 ;; `tree-sitter-live-tree'.
 
 ;;; Code:
-(require 'tree-sitter-defs)
-(require 'tree-sitter-module)
+(require 'tree-sitter)
 
 
 ;; Internal variables
