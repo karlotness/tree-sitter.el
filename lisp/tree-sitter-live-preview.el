@@ -53,7 +53,16 @@
          (start (byte-to-position start-byte))
          (end (byte-to-position end-byte))
          (text (tree-sitter-live-preview--shorten (buffer-substring start end))))
-    (format "%s [%s]" name text)))
+    (cons (format "%s" name) (format "[%s]" text))))
+
+(defun tree-sitter-live-preview--do-button (button)
+  (let ((node (button-get button 'tree-sitter-node)))
+    (pop-to-buffer tree-sitter-live-preview--buffer
+                   'display-buffer-reuse-window t)
+    (let ((start (byte-to-position (tree-sitter-node-start-byte node)))
+          (end (byte-to-position (tree-sitter-node-end-byte node))))
+      (goto-char start)
+      (push-mark end t t))))
 
 (defun tree-sitter-live-preview--node (node parent-markers)
   (let* ((name (tree-sitter-node-type node))
@@ -66,9 +75,16 @@
                                             (mapcar (lambda (b) (if b "│ " "  "))
                                                     parent-markers)))
                             ""))
-         (node-desc (tree-sitter-live-preview--format node)))
+         (node-desc (tree-sitter-live-preview--format node))
+         (node-symbol (car node-desc))
+         (node-text (cdr node-desc)))
     (with-current-buffer tree-sitter-live-preview--buffer
-      (insert prefix node-desc "\n"))
+      (insert prefix)
+      (insert-button node-symbol
+                     'action #'tree-sitter-live-preview--do-button
+                     'follow-link t
+                     'tree-sitter-node node)
+      (insert " " node-text "\n"))
     (when next-child
       (tree-sitter-live-preview--node next-child (cons next-sibling parent-markers)))
     (when next-sibling
