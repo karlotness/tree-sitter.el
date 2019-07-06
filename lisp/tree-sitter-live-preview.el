@@ -53,7 +53,8 @@
          (start (byte-to-position start-byte))
          (end (byte-to-position end-byte))
          (text (tree-sitter-live-preview--shorten (buffer-substring start end))))
-    (cons (format "%s" name) (format "[%s]" text))))
+    (let ((print-escape-newlines t))
+      (cons (prin1-to-string name) (format "[%s]" text)))))
 
 (defun tree-sitter-live-preview--do-button (button)
   (let ((node (button-get button 'tree-sitter-node)))
