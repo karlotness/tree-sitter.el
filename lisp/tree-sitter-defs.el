@@ -76,8 +76,9 @@ unspecified, use `point'"
       (save-restriction
         (widen)
         (goto-char position)
-        (let ((row (line-number-at-pos))
-              (col (current-column)))
+        (let* ((buffer-invisibility-spec nil)
+               (row (line-number-at-pos))
+               (col (current-column)))
           (tree-sitter-point--create row col))))))
 
 (defun tree-sitter--coerce-byte (buf byte-pos)
