@@ -77,6 +77,40 @@ enabled."
       (add-hook 'tree-sitter-live-mode-hook #'tree-sitter-fontify-mode-turn-on 0 t)
       (tree-sitter-live-mode-turn-on)))))
 
+;;;###autoload
+(defmacro define-tree-sitter-fontifier (name &rest defs)
+  "Define a new fontifier used with `tree-sitter-fontify'.
+A fontifier specifies rules for applying particular faces to
+nodes in a parse-tree. In this macro DEFS is a sequence of such
+rules each with the form (MATCH . ACTION) where each element is
+described below.
+
+MATCH:
+
+(and MATCH...)
+
+(or MATCH...)
+
+(child MATCH)
+
+(nth-child N MATCH)
+
+(symbol NAME &optional TYPE)
+
+(text TEXT)
+
+(re REGEXP)
+
+(scope-text TEXT)
+
+(scope-re REGEXP)
+
+ACTION:
+
+(face FACE)
+
+(face-back FACE)")
+
 
 ;; Minor modes
 
