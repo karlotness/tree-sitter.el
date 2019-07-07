@@ -57,6 +57,50 @@
   ;; Restore original font-lock functions
   (setq font-lock-fontify-region-function tree-sitter-fontify--orig-fontify-region))
 
+(defun tree-sitter-fontify--validate-match (match)
+  (let ((symb (car match))
+        (rest (cdr match)))
+    (when rest
+      (cond
+       ((eq symb 'and) (cl-every #'tree-sitter-fontify--validate-match rest))
+       ((eq symb 'or) (cl-every #'tree-sitter-fontify--validate-match rest))
+       ((eq symb 'child) (and (= (length rest) 1)
+                              (tree-sitter-fontify--validate-match rest)))
+       ((eq symb 'nth-child) (and (= (length rest) 2)
+                                  (natnump (car rest))
+                                  (tree-sitter-fontify--validate-match (cadr rest))))
+       ((eq symb 'symbol) (and (<= (length rest) 2)
+                               (symbolp (car rest))
+                               (if (cdr rest)
+                                   (memq (cadr rest) '(regular anonymous auxiliary))
+                                 t)))
+       ((eq symb 'text) (and (= (length rest) 1)
+                             (stringp (car rest))))
+       ((eq symb 're) (and (= (length rest) 1)
+                               (stringp (car rest))))
+       ((eq symb 'scope-text) (and (= (length rest) 1)
+                                   (stringp (car rest))))
+       ((eq symb 'scope-re) (and (= (length rest) 1)
+                                 (stringp (car rest))))
+       (t nil)))))
+
+(defun tree-sitter-fontify--validate-action (act)
+  (when (= (length act) 2)
+    (let ((symb (car act))
+          (rest (cadr act)))
+      (and (memq symb '(face face-back))
+           (symbolp rest)))))
+
+(defun tree-sitter-fontify--validate-fontifier (def)
+  (dolist (d def)
+    (let ((match (car d))
+          (act (cdr d)))
+      (unless (tree-sitter-fontify--validate-match match)
+        (error "Invalid match: %s" match))
+      (unless (tree-sitter-fontify--validate-action act)
+        (error "Invalid action: %s" act))))
+  t)
+
 
 ;; Other functions
 (defun tree-sitter-fontify-mode-turn-on ()
@@ -109,7 +153,10 @@ ACTION:
 
 (face FACE)
 
-(face-back FACE)")
+(face-back FACE)"
+  (let ((match-id 0))
+    (unless (tree-sitter-fontify--validate-fontifier defs)
+      (error "Invalid fontifier"))))
 
 
 ;; Minor modes
