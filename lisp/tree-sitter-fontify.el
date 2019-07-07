@@ -48,14 +48,25 @@
 ;; Internal functions
 (defun tree-sitter-fontify--region (beg end &optional verbose))
 
+(defun tree-sitter-fontify--new-tree (old-tree)
+  (let ((ranges (tree-sitter-tree-changed-ranges old-tree tree-sitter-live-tree)))
+    (dolist (r ranges)
+      (let* ((start-byte (tree-sitter-range-start-byte r))
+             (end-byte (tree-sitter-range-end-byte r))
+             (beg (byte-to-position start-byte))
+             (end (byte-to-position end-byte)))
+        (funcall font-lock-flush-function beg end)))))
+
 (defun tree-sitter-fontify--enable ()
   ;; Save original font-lock functions
   (setq tree-sitter-fontify--orig-fontify-region font-lock-fontify-region-function)
-  (setq font-lock-fontify-region-function #'tree-sitter-fontify--region))
+  (setq font-lock-fontify-region-function #'tree-sitter-fontify--region)
+  (add-hook 'tree-sitter-live-after-parse-functions #'tree-sitter-fontify--new-tree 0 t))
 
 (defun tree-sitter-fontify--disable ()
   ;; Restore original font-lock functions
-  (setq font-lock-fontify-region-function tree-sitter-fontify--orig-fontify-region))
+  (setq font-lock-fontify-region-function tree-sitter-fontify--orig-fontify-region)
+  (remove-hook 'tree-sitter-live-after-parse-functions #'tree-sitter-fontify--new-tree t))
 
 (defun tree-sitter-fontify--validate-match (match)
   (let ((symb (car match))
