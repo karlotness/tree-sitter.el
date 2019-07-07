@@ -130,9 +130,8 @@ enabled."
     (add-hook 'tree-sitter-live-mode-hook #'tree-sitter-fontify-mode-turn-on 0 t))
    (t
     ;; Try to manually enable the live mode
-    (progn
-      (add-hook 'tree-sitter-live-mode-hook #'tree-sitter-fontify-mode-turn-on 0 t)
-      (tree-sitter-live-mode-turn-on)))))
+    (add-hook 'tree-sitter-live-mode-hook #'tree-sitter-fontify-mode-turn-on 0 t)
+    (tree-sitter-live-mode-turn-on))))
 
 ;;;###autoload
 (defmacro define-tree-sitter-fontifier (name &rest defs)
