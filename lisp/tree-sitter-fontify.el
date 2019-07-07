@@ -168,7 +168,9 @@ ACTION:
 (face-back FACE)"
   (let ((match-id 0))
     (unless (tree-sitter-fontify--validate-fontifier defs)
-      (error "Invalid fontifier"))))
+      (error "Invalid fontifier"))
+    `(defun ,name (lang)
+       "Specialize a tree-sitter fontifier for language LANG.")))
 
 
 ;; Minor modes
