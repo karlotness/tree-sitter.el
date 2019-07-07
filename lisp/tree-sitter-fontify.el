@@ -64,8 +64,9 @@
       (cond
        ((eq symb 'and) (cl-every #'tree-sitter-fontify--validate-match rest))
        ((eq symb 'or) (cl-every #'tree-sitter-fontify--validate-match rest))
-       ((eq symb 'child) (and (= (length rest) 1)
-                              (tree-sitter-fontify--validate-match rest)))
+       ((eq symb 'child) (and (= (length rest) 2)
+                              (tree-sitter-fontify--validate-match (car rest))
+                              (tree-sitter-fontify--validate-match (cadr rest))))
        ((eq symb 'nth-child) (and (= (length rest) 2)
                                   (natnump (car rest))
                                   (tree-sitter-fontify--validate-match (cadr rest))))
@@ -135,7 +136,7 @@ MATCH:
 
 (or MATCH...)
 
-(child MATCH)
+(child MATCH MATCH)
 
 (nth-child N MATCH)
 
