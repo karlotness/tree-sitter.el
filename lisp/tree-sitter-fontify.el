@@ -123,6 +123,7 @@ enabled."
   (cond
    (tree-sitter-live-mode
     ;; Already ready to go
+    (remove-hook 'tree-sitter-live-mode-hook #'tree-sitter-fontify-mode-turn-on t)
     (tree-sitter-fontify-mode 1))
    (global-tree-sitter-live-mode
     ;; We can just wait for the global mode to check for us
