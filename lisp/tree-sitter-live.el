@@ -105,7 +105,12 @@ If the timer does not exist and FORCE is nil, do nothing."
         (run-hook-with-args 'tree-sitter-live-after-parse-functions old-tree)))))
   (setq tree-sitter-live--pending-buffers nil))
 
-(defun tree-sitter-live--auto-language ()
+(defun tree-sitter-live-major-mode-auto ()
+  "Choose a tree-sitter language based on a buffer's major-mode.
+The languages used are defined by `tree-sitter-live-auto-alist'.
+
+This function is intended to be used with
+`tree-sitter-live-auto-functions'."
   (catch 'tree-sitter-live--auto-language
     (dolist (lp tree-sitter-live-auto-alist)
       (let ((mode (car lp))
@@ -113,6 +118,9 @@ If the timer does not exist and FORCE is nil, do nothing."
         (when (derived-mode-p mode)
           (throw 'tree-sitter-live--auto-language (funcall lang)))))
     nil))
+
+(defun tree-sitter-live--auto-language ()
+  (run-hook-with-args-until-success 'tree-sitter-live-auto-functions))
 
 (defun tree-sitter-live--setup (language)
   "Enable tree-sitter-live for LANGUAGE in current buffer.
@@ -141,8 +149,8 @@ LANGUAGE must be a tree-sitter-language record."
 ;; Other functions
 (defun tree-sitter-live-mode-turn-on ()
   "Maybe enable `tree-sitter-live-mode' for a buffer.
-Enable the mode if a language is defined for its major mode in
-`tree-sitter-live-auto-alist'."
+Enable the mode if a language is defined chosen based on
+`tree-sitter-live-auto-functions'."
   (when (tree-sitter-live--auto-language)
     (tree-sitter-live-mode)))
 
@@ -173,11 +181,25 @@ value provided to these functions will be nil."
   :type 'hook
   :group 'tree-sitter-live)
 
+(defcustom tree-sitter-live-auto-functions '(tree-sitter-live-major-mode-auto)
+  "Functions used to determine the tree-sitter language for a buffer.
+These functions are called in order until one returns non-nil.
+The first non-nil value will be used as the tree-sitter language
+for the given buffer. If no function returns non-nil, automatic
+language determination fails."
+  :type 'hook
+  :group 'tree-sitter-live)
+
 (defcustom tree-sitter-live-auto-alist nil
   "Alist specifying tree-sitter languages by major mode symbols.
 Each entry is a pair of (MODE . LANG) where MODE is a major-mode
 symbol and LANG is function which, when called with no arguments,
-returns a tree-sitter language"
+returns a tree-sitter language. LANG will be chosen for buffers
+whose major modes are derived from MODE.
+
+The values in this alist are used by
+`tree-sitter-live-major-mode-auto'. See also
+`tree-sitter-live-auto-functions'."
   :type '(alist :key-type symbol :value-type function)
   :group 'tree-sitter-live)
 
@@ -188,7 +210,7 @@ returns a tree-sitter language"
 (define-minor-mode tree-sitter-live-mode
   "Minor mode which parses a buffer during idle time with tree-sitter.
 
-The language to use is chosen based on `tree-sitter-live-auto-alist'."
+The language to use is chosen based on `tree-sitter-live-auto-functions'."
   :lighter ""
   :group 'tree-sitter-live
   (if tree-sitter-live-mode
