@@ -1,6 +1,9 @@
 # tree-sitter.el
 An Emacs dynamic module exposing [tree-sitter][1].
 
+The package in this repository is relatively inactive. Check out
+[ubolonton/emacs-tree-sitter](https://github.com/ubolonton/emacs-tree-sitter).
+
 This package requires Emacs 26 or above.
 
 ## Status
